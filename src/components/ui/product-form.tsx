@@ -114,7 +114,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
         original_price: originalPrice,
         discount_percentage: discountPercentage,
         category: formData.category,
-        badge: formData.badge || null,
+        badge: formData.badge === 'none' ? null : formData.badge,
         affiliate_link: formData.affiliate_link,
         images: formData.images,
         is_active: formData.is_active
@@ -265,7 +265,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
                     <SelectValue placeholder="Select badge (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No Badge</SelectItem>
+                    <SelectItem value="none">No Badge</SelectItem>
                     {badges.map((badge) => (
                       <SelectItem key={badge} value={badge}>
                         {badge}
