@@ -54,11 +54,8 @@ export function Header({
               <div className="relative">
                 <AnimatedLogo /> {/* ✅ animated logo */}
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
-              </div>
-              <h1 className="text-3xl font-bold text-gradient">SwiftMart</h1>
-            </div>
-
-            {/* Auth/Admin/Mobile Controls */}
+                   
+              {/* Auth/Admin/Mobile Controls */}
             <div className="flex items-center space-x-2">
               {user ? (
                 <Button
