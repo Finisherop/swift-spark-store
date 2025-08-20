@@ -188,7 +188,6 @@ export default function Index() {
         onFilterChange={setSelectedCategory}
         selectedCategory={selectedCategory}
         searchQuery={searchQuery}
-        isAdmin={false}
         onAdminClick={() => setShowAdminLogin(true)}
       />
 

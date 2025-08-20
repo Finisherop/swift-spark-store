@@ -3,25 +3,39 @@ import { Button } from "./button";
 import { ShoppingBag, Sparkles, Zap, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import heroBg from "@/assets/hero-bg.jpg";
+import fashionHoodie from "@/assets/products/fashion-hoodie.jpg";
+import beautyProducts from "@/assets/products/beauty-products.jpg";
+import proteinFoods from "@/assets/products/protein-foods.jpg";
+import digitalEbook from "@/assets/products/digital-ebook.jpg";
 
 const heroSlides = [
   {
     title: "Swift Shopping, Smart Savings",
     subtitle: "Discover premium products at unbeatable prices",
     icon: <Zap className="h-6 w-6" />,
-    cta: "Shop Now"
+    cta: "Shop Now",
+    image: fashionHoodie
   },
   {
-    title: "Fashion That Defines You",
-    subtitle: "Trendy styles for every occasion and personality",
+    title: "Beauty & Wellness Collection",
+    subtitle: "Premium skincare and beauty products for your glow",
     icon: <Heart className="h-6 w-6" />,
-    cta: "Explore Fashion"
+    cta: "Explore Beauty",
+    image: beautyProducts
   },
   {
-    title: "Quality You Can Trust",
-    subtitle: "Handpicked products from trusted brands worldwide",
+    title: "Health & Fitness Essentials",
+    subtitle: "Fuel your body with premium protein and nutrition",
     icon: <Sparkles className="h-6 w-6" />,
-    cta: "Discover More"
+    cta: "Shop Health",
+    image: proteinFoods
+  },
+  {
+    title: "Digital Products & Guides",
+    subtitle: "Transform your business with our digital resources",
+    icon: <ShoppingBag className="h-6 w-6" />,
+    cta: "Get Digital",
+    image: digitalEbook
   }
 ];
 
