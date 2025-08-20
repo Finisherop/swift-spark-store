@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/ui/header";
 import { HeroSection } from "@/components/ui/hero-section";
+import { SearchCategorySection } from "@/components/ui/search-category-section";
 import { ProductGrid } from "@/components/ui/product-grid";
 import { AdminLogin } from "@/components/ui/admin-login";
 import { AdminDashboard } from "@/components/ui/admin-dashboard";
@@ -163,7 +164,7 @@ export default function Index() {
   };
 
   const scrollToProducts = () => {
-    const element = document.getElementById('products-section');
+    const element = document.getElementById('search-section');
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -192,6 +193,15 @@ export default function Index() {
       />
 
       <HeroSection onExploreClick={scrollToProducts} />
+
+      <div id="search-section">
+        <SearchCategorySection
+          onSearch={setSearchQuery}
+          onFilterChange={setSelectedCategory}
+          selectedCategory={selectedCategory}
+          searchQuery={searchQuery}
+        />
+      </div>
 
       <div id="products-section">
         <ProductGrid

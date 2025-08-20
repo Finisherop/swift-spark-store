@@ -6,7 +6,7 @@ import { AuthModal } from "./auth-modal";
 import { ProfileModal } from "./profile-modal";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import swiftMartLogo from "@/assets/swiftmart-logo.png";
+import cartLogo from "@/assets/cart-logo.png";
 
 interface HeaderProps {
   onSearch: (query: string) => void;
@@ -48,49 +48,17 @@ export function Header({
           {/* Main Header */}
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <img 
-                src={swiftMartLogo} 
-                alt="SwiftMart Logo" 
-                className="h-10 w-10 object-contain animate-bounce-in"
-              />
-              <h1 className="text-2xl font-bold text-gradient">SwiftMart</h1>
-            </div>
-
-            {/* Desktop Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-lg mx-8">
-              <div className="relative w-full group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 transition-colors group-focus-within:text-primary" />
-                <Input
-                  type="text"
-                  placeholder="Search for products, brands, categories..."
-                  value={searchQuery}
-                  onChange={(e) => onSearch(e.target.value)}
-                  className="pl-12 pr-4 h-12 text-base bg-white/50 backdrop-blur-sm border-2 border-transparent focus:border-primary/30 focus:bg-white transition-all duration-300 shadow-soft hover:shadow-medium focus:shadow-glow rounded-xl"
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <img 
+                  src={cartLogo} 
+                  alt="SwiftMart Cart Logo" 
+                  className="h-12 w-12 object-contain animate-bounce-in hover:animate-pulse transition-all duration-300 transform hover:scale-110"
                 />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
               </div>
+              <h1 className="text-3xl font-bold text-gradient">SwiftMart</h1>
             </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-2">
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={selectedCategory === category.id ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => onFilterChange(category.id)}
-                  className={cn(
-                    "px-4 py-2 rounded-lg font-medium transition-all duration-300",
-                    selectedCategory === category.id 
-                      ? "bg-primary text-primary-foreground shadow-glow scale-105" 
-                      : "hover:bg-primary/10 hover:text-primary hover:scale-105"
-                  )}
-                >
-                  <category.icon className="h-4 w-4 mr-2" />
-                  {category.name}
-                </Button>
-              ))}
-            </nav>
 
             {/* Auth/Admin/Mobile Controls */}
             <div className="flex items-center space-x-2">
@@ -139,42 +107,6 @@ export function Header({
           {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t animate-fade-in">
-              {/* Mobile Search */}
-              <div className="relative mb-4 group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 transition-colors group-focus-within:text-primary" />
-                <Input
-                  type="text"
-                  placeholder="Search for products, brands, categories..."
-                  value={searchQuery}
-                  onChange={(e) => onSearch(e.target.value)}
-                  className="pl-12 pr-4 h-12 text-base bg-white/50 backdrop-blur-sm border-2 border-transparent focus:border-primary/30 focus:bg-white transition-all duration-300 shadow-soft hover:shadow-medium focus:shadow-glow rounded-xl"
-                />
-              </div>
-
-              {/* Mobile Categories */}
-              <div className="grid grid-cols-2 gap-2 mb-4">
-                {categories.map((category) => (
-                  <Button
-                    key={category.id}
-                    variant={selectedCategory === category.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      onFilterChange(category.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={cn(
-                      "justify-start transition-all duration-300",
-                      selectedCategory === category.id 
-                        ? "shadow-glow scale-105" 
-                        : "hover:scale-105"
-                    )}
-                  >
-                    <category.icon className="h-4 w-4 mr-2" />
-                    {category.name}
-                  </Button>
-                ))}
-              </div>
-
               {/* Mobile Auth/Admin Buttons */}
               <div className="space-y-2">
                 {user ? (

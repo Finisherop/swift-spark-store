@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "./button";
 import { Badge } from "./badge";
-import { Eye, ShoppingCart, Star } from "lucide-react";
+import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
@@ -25,6 +26,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   // Auto-swipe images every 3 seconds
   useEffect(() => {
@@ -58,6 +61,42 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
 
   const handleBuyNow = () => {
     onBuyNow(product);
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/product/${product.id}`;
+    const shareText = `Check out this amazing product: ${product.name} - Only ₹${product.price}!`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('Share failed:', error);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
+        setCopied(true);
+        toast({
+          title: "Link Copied!",
+          description: "Product link has been copied to clipboard",
+        });
+        
+        setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        console.log('Copy failed:', error);
+        toast({
+          title: "Share Failed",
+          description: "Unable to copy link to clipboard",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   return (
@@ -126,6 +165,14 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
             <ShoppingCart className="h-4 w-4 mr-1" />
             Buy
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="shadow-medium bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
+            onClick={handleShare}
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
 
@@ -171,6 +218,14 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
             Buy Now
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleShare}
+            className="px-3 transition-smooth hover:shadow-medium hover:bg-primary/10"
+          >
+            {copied ? <Check className="h-4 w-4 text-green-600" /> : <Share2 className="h-4 w-4" />}
           </Button>
         </div>
       </div>
