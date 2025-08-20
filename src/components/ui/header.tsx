@@ -1,19 +1,21 @@
-import { useState } from "react";
-import { Search, ShoppingBag, Menu, X, User, Sparkles, Heart, Zap, Package } from "lucide-react";
-import { Button } from "./button";
-import { Input } from "./input";
-import { AuthModal } from "./auth-modal";
-import { ProfileModal } from "./profile-modal";
-import { useAuth } from "@/hooks/useAuth";
-import { cn } from "@/lib/utils";
-import { Animatedlogo} from "./swiftmart-logo";
+"use client"
+
+import { useState } from "react"
+import { Search, ShoppingBag, Menu, X, User, Sparkles, Heart, Zap, Package } from "lucide-react"
+import { Button } from "./button"
+import { Input } from "./input"
+import { AuthModal } from "./auth-modal"
+import { ProfileModal } from "./profile-modal"
+import { useAuth } from "@/hooks/useAuth"
+import { cn } from "@/lib/utils"
+import { AnimatedLogo } from "./swiftmart-logo" // ✅ animated logo import
 
 interface HeaderProps {
-  onSearch: (query: string) => void;
-  onFilterChange: (category: string) => void;
-  selectedCategory: string;
-  searchQuery: string;
-  onAdminClick?: () => void;
+  onSearch: (query: string) => void
+  onFilterChange: (category: string) => void
+  selectedCategory: string
+  searchQuery: string
+  onAdminClick?: () => void
 }
 
 const categories = [
@@ -22,19 +24,19 @@ const categories = [
   { id: "Health & Fitness", name: "Health & Fitness", icon: Zap },
   { id: "Digital Products", name: "Digital Products", icon: Sparkles },
   { id: "Beauty", name: "Beauty", icon: Heart },
-];
+]
 
-export function Header({ 
-  onSearch, 
-  onFilterChange, 
-  selectedCategory, 
+export function Header({
+  onSearch,
+  onFilterChange,
+  selectedCategory,
   searchQuery,
-  onAdminClick 
+  onAdminClick,
 }: HeaderProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const { user } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const { user } = useAuth()
 
   return (
     <>
@@ -44,18 +46,13 @@ export function Header({
           <div className="py-2 text-center bg-primary/5 text-sm text-muted-foreground">
             🎉 Welcome to SwiftMart! Discover amazing products at unbeatable prices 🛍️
           </div>
-          
+
           {/* Main Header */}
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-3">
-  <div className="relative">
-    <AnimatedLogo /> {/* ✅ animated logo */}
-    <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
-  </div>
-  <h1 className="text-3xl font-bold text-gradient">SwiftMart</h1>
-</div>
+              <div className="relative">
+                <AnimatedLogo /> {/* ✅ animated logo */}
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
               </div>
               <h1 className="text-3xl font-bold text-gradient">SwiftMart</h1>
@@ -64,8 +61,8 @@ export function Header({
             {/* Auth/Admin/Mobile Controls */}
             <div className="flex items-center space-x-2">
               {user ? (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setShowProfileModal(true)}
                   className="hidden md:flex items-center gap-2 hover-scale transition-bounce"
@@ -74,8 +71,8 @@ export function Header({
                   Profile
                 </Button>
               ) : (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setShowAuthModal(true)}
                   className="hidden md:flex hover-scale transition-bounce"
@@ -83,16 +80,16 @@ export function Header({
                   Sign In
                 </Button>
               )}
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={onAdminClick}
                 className="hidden md:flex hover-scale transition-bounce"
               >
                 Admin
               </Button>
-              
+
               {/* Mobile Menu Button */}
               <Button
                 variant="ghost"
@@ -111,12 +108,12 @@ export function Header({
               {/* Mobile Auth/Admin Buttons */}
               <div className="space-y-2">
                 {user ? (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => {
-                      setShowProfileModal(true);
-                      setIsMobileMenuOpen(false);
+                      setShowProfileModal(true)
+                      setIsMobileMenuOpen(false)
                     }}
                     className="w-full justify-start"
                   >
@@ -124,25 +121,25 @@ export function Header({
                     Profile
                   </Button>
                 ) : (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => {
-                      setShowAuthModal(true);
-                      setIsMobileMenuOpen(false);
+                      setShowAuthModal(true)
+                      setIsMobileMenuOpen(false)
                     }}
                     className="w-full justify-start"
                   >
                     Sign In
                   </Button>
                 )}
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
-                    onAdminClick?.();
-                    setIsMobileMenuOpen(false);
+                    onAdminClick?.()
+                    setIsMobileMenuOpen(false)
                   }}
                   className="w-full justify-start"
                 >
@@ -157,5 +154,5 @@ export function Header({
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
       <ProfileModal open={showProfileModal} onOpenChange={setShowProfileModal} />
     </>
-  );
+  )
 }
