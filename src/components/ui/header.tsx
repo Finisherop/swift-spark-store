@@ -6,7 +6,7 @@ import { AuthModal } from "./auth-modal";
 import { ProfileModal } from "./profile-modal";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import { Swiftmart-logo} from "./swiftmart-logo";
+import { Animatedlogo} from "./swiftmart-logo";
 
 interface HeaderProps {
   onSearch: (query: string) => void;
@@ -49,12 +49,13 @@ export function Header({
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-3">
-              <div className="relative">
-                <img 
-                  src={Swiftmart-logo} 
-                  alt="SwiftMart Cart Logo" 
-                  className="h-12 w-12 object-contain animate-bounce-in hover:animate-pulse transition-all duration-300 transform hover:scale-110"
-                />
+              <div className="flex items-center space-x-3">
+  <div className="relative">
+    <AnimatedLogo /> {/* ✅ animated logo */}
+    <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
+  </div>
+  <h1 className="text-3xl font-bold text-gradient">SwiftMart</h1>
+</div>
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
               </div>
               <h1 className="text-3xl font-bold text-gradient">SwiftMart</h1>
