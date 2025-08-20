@@ -54,8 +54,47 @@ export function Header({
               <div className="relative">
                 <AnimatedLogo /> {/* ✅ animated logo */}
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
-                   
-              {/* Auth/Admin/Mobile Controls */}
+              </div>
+              <span className="font-bold text-xl text-primary">SwiftMart</span>
+            </div>
+
+            {/* Search Bar */}
+            <div className="hidden md:flex flex-1 max-w-lg mx-8">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => onSearch(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-full rounded-full"
+                />
+              </div>
+            </div>
+
+            {/* Desktop Category Filter */}
+            <div className="hidden lg:flex items-center space-x-1">
+              {categories.map((category) => {
+                const Icon = category.icon
+                return (
+                  <Button
+                    key={category.id}
+                    variant={selectedCategory === category.id ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => onFilterChange(category.id)}
+                    className={cn(
+                      "rounded-full px-3",
+                      selectedCategory === category.id && "shadow-md"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 mr-1" />
+                    <span className="hidden xl:inline">{category.name}</span>
+                  </Button>
+                )
+              })}
+            </div>
+
+            {/* Auth/Admin/Mobile Controls */}
             <div className="flex items-center space-x-2">
               {user ? (
                 <Button
@@ -96,6 +135,44 @@ export function Header({
               >
                 {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
+            </div>
+          </div>
+
+          {/* Mobile Search Bar */}
+          <div className="md:hidden py-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => onSearch(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full rounded-full"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Category Filter */}
+          <div className="md:hidden pb-3 overflow-x-auto scrollbar-hide">
+            <div className="flex space-x-2 min-w-max">
+              {categories.map((category) => {
+                const Icon = category.icon
+                return (
+                  <Button
+                    key={category.id}
+                    variant={selectedCategory === category.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onFilterChange(category.id)}
+                    className={cn(
+                      "rounded-full whitespace-nowrap",
+                      selectedCategory === category.id && "shadow-md"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 mr-1" />
+                    {category.name}
+                  </Button>
+                )
+              })}
             </div>
           </div>
 
