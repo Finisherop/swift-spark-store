@@ -227,4 +227,5 @@ export function Header({
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
       <ProfileModal open={showProfileModal} onOpenChange={setShowProfileModal} />
     </>
- 
+  )
+}
