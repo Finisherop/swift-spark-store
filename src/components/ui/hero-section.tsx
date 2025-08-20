@@ -3,10 +3,10 @@ import { Button } from "./button";
 import { ShoppingBag, Sparkles, Zap, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import heroBg from "@/assets/hero-bg.jpg";
-import fashionHoodie from "@/assets/products/fashion-hoodie.jpg";
-import beautyProducts from "@/assets/products/beauty-products.jpg";
-import proteinFoods from "@/assets/products/protein-foods.jpg";
-import digitalEbook from "@/assets/products/digital-ebook.jpg";
+import fashionHoodie from "@/assets/hero/fashion-hoodie.jpg";
+import beautyProducts from "@/assets/hero/beauty-products.jpg";
+import proteinFoods from "@/assets/hero/protein-foods.jpg";
+import digitalEbook from "@/assets/hero/digital-ebook.jpg";
 
 const heroSlides = [
   {
@@ -14,28 +14,32 @@ const heroSlides = [
     subtitle: "Discover premium products at unbeatable prices",
     icon: <Zap className="h-6 w-6" />,
     cta: "Shop Now",
-    image: fashionHoodie
+    image: fashionHoodie,
+    bgImage: fashionHoodie
   },
   {
     title: "Beauty & Wellness Collection",
     subtitle: "Premium skincare and beauty products for your glow",
     icon: <Heart className="h-6 w-6" />,
     cta: "Explore Beauty",
-    image: beautyProducts
+    image: beautyProducts,
+    bgImage: beautyProducts
   },
   {
     title: "Health & Fitness Essentials",
     subtitle: "Fuel your body with premium protein and nutrition",
     icon: <Sparkles className="h-6 w-6" />,
     cta: "Shop Health",
-    image: proteinFoods
+    image: proteinFoods,
+    bgImage: proteinFoods
   },
   {
     title: "Digital Products & Guides",
     subtitle: "Transform your business with our digital resources",
     icon: <ShoppingBag className="h-6 w-6" />,
     cta: "Get Digital",
-    image: digitalEbook
+    image: digitalEbook,
+    bgImage: digitalEbook
   }
 ];
 
@@ -58,14 +62,15 @@ export function HeroSection({ onExploreClick }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* Dynamic Background Image with Overlay */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
         style={{
-          backgroundImage: `url(${heroBg})`,
+          backgroundImage: `url(${currentHero.bgImage})`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent" />
       </div>
 
       {/* Hero Content */}
