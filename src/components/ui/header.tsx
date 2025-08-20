@@ -50,12 +50,11 @@ export function Header({
           {/* Main Header */}
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center">
               <div className="relative">
                 <AnimatedLogo /> {/* ✅ animated logo */}
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
               </div>
-              <span className="font-bold text-xl text-primary">SwiftMart</span>
             </div>
 
             {/* Search Bar */}
