@@ -14,7 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      product_clicks: {
+        Row: {
+          click_type: string
+          clicked_at: string
+          id: string
+          product_id: string
+          user_agent: string | null
+          user_ip: string | null
+        }
+        Insert: {
+          click_type: string
+          clicked_at?: string
+          id?: string
+          product_id: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Update: {
+          click_type?: string
+          clicked_at?: string
+          id?: string
+          product_id?: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_clicks_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          affiliate_link: string
+          badge: string | null
+          category: string
+          created_at: string
+          description: string | null
+          discount_percentage: number | null
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          name: string
+          original_price: number | null
+          price: number
+          short_description: string | null
+          updated_at: string
+        }
+        Insert: {
+          affiliate_link: string
+          badge?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          name: string
+          original_price?: number | null
+          price: number
+          short_description?: string | null
+          updated_at?: string
+        }
+        Update: {
+          affiliate_link?: string
+          badge?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          name?: string
+          original_price?: number | null
+          price?: number
+          short_description?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      website_users: {
+        Row: {
+          first_visit: string
+          id: string
+          last_visit: string
+          user_agent: string | null
+          user_ip: string | null
+        }
+        Insert: {
+          first_visit?: string
+          id?: string
+          last_visit?: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Update: {
+          first_visit?: string
+          id?: string
+          last_visit?: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
