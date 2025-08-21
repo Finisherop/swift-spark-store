@@ -9,6 +9,8 @@ import { Header } from "@/components/ui/header";
 import { ArrowLeft, ExternalLink, Star, Shield, Truck, RefreshCw, Share, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/utils/CurrencyContext";
+import { formatCurrency } from "@/utils/currency";
 
 interface Product {
   id: string;
@@ -32,6 +34,9 @@ export default function ProductDetails() {
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  
+  // Currency context
+  const { currency, rate } = useCurrency();
 
   useEffect(() => {
     if (id) {
@@ -42,7 +47,7 @@ export default function ProductDetails() {
   const fetchProduct = async (productId: string) => {
     try {
       setLoading(true);
-      
+
       // Fetch the main product
       const { data: productData, error: productError } = await supabase
         .from('products')
@@ -98,7 +103,7 @@ export default function ProductDetails() {
 
   const handleBuyNow = async () => {
     if (!product) return;
-    
+
     await trackClick('buy_now');
     window.open(product.affiliate_link, '_blank');
   };
@@ -133,7 +138,7 @@ export default function ProductDetails() {
 
   const handleShareProduct = async () => {
     const productUrl = `${window.location.origin}/product/${product?.id}`;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -151,7 +156,7 @@ export default function ProductDetails() {
 
   const handleCopyLink = async () => {
     const productUrl = `${window.location.origin}/product/${product?.id}`;
-    
+
     try {
       await navigator.clipboard.writeText(productUrl);
       setCopied(true);
@@ -159,7 +164,7 @@ export default function ProductDetails() {
         title: "Link Copied!",
         description: "Product link copied to clipboard",
       });
-      
+
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Failed to copy:', error);
@@ -216,20 +221,20 @@ export default function ProductDetails() {
       <Helmet>
         <title>{product?.name ? `${product.name} - SwiftMart` : 'SwiftMart'}</title>
         <meta name="description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
-        
+
         {/* Open Graph Meta Tags */}
         <meta property="og:title" content={product?.name || 'SwiftMart'} />
         <meta property="og:description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
         <meta property="og:type" content="product" />
         <meta property="og:url" content={`${window.location.origin}/product/${product?.id}`} />
         {product?.images?.[0] && <meta property="og:image" content={product.images[0]} />}
-        
+
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={product?.name || 'SwiftMart'} />
         <meta name="twitter:description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
         {product?.images?.[0] && <meta name="twitter:image" content={product.images[0]} />}
-        
+
         {/* Product Schema */}
         {product && (
           <script type="application/ld+json">
@@ -242,8 +247,8 @@ export default function ProductDetails() {
               "offers": {
                 "@type": "Offer",
                 "url": `${window.location.origin}/product/${product.id}`,
-                "priceCurrency": "INR",
-                "price": product.price,
+                "priceCurrency": currency,
+                "price": product.price * rate,
                 "availability": "https://schema.org/InStock"
               }
             })}
@@ -300,11 +305,11 @@ export default function ProductDetails() {
               <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                 <div className="flex items-baseline space-x-3">
                   <span className="text-3xl lg:text-5xl font-black text-success drop-shadow-sm">
-                    ₹{product.price.toLocaleString()}
+                    {formatCurrency(product.price * rate, currency)}
                   </span>
                   {product.original_price && product.original_price > product.price && (
                     <span className="text-lg lg:text-xl text-muted-foreground/60 line-through font-medium">
-                      ₹{product.original_price.toLocaleString()}
+                      {formatCurrency(product.original_price * rate, currency)}
                     </span>
                   )}
                 </div>
@@ -328,7 +333,7 @@ export default function ProductDetails() {
                   {product.category}
                 </Badge>
               </div>
-              
+
               {/* Share Buttons */}
               <div className="flex gap-2">
                 <Button
@@ -380,7 +385,7 @@ export default function ProductDetails() {
                 className="w-full text-lg font-bold py-6 shadow-strong hover:shadow-glow transition-all duration-300 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary"
               >
                 <ExternalLink className="mr-2 h-5 w-5" />
-                Buy Now - ₹{product.price.toLocaleString()}
+                Buy Now - {formatCurrency(product.price * rate, currency)}
               </Button>
             </div>
           </div>
