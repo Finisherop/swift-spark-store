@@ -10,7 +10,7 @@ import { ArrowLeft, ExternalLink, Star, Shield, Truck, RefreshCw, Share, Copy, C
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/utils/CurrencyContext";
-import { convertAndFormatPrice } from "@/utils/currency";
+import { useFormattedLocalPrice } from "@/hooks/useLocalCurrency";
 
 interface Product {
   id: string;
@@ -35,8 +35,13 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   
-  // Currency context
+  // Currency context (keeping for compatibility)
   const { currency, rate } = useCurrency();
+  
+  // Local currency formatting hooks
+  const { formattedPrice: currentPriceFormatted } = useFormattedLocalPrice(product?.price || 0);
+  const { formattedPrice: originalPriceFormatted } = useFormattedLocalPrice(product?.original_price || 0);
+  const { formattedPrice: buyNowPriceFormatted } = useFormattedLocalPrice(product?.price || 0);
 
   useEffect(() => {
     if (id) {
@@ -305,11 +310,11 @@ export default function ProductDetails() {
               <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                 <div className="flex items-baseline space-x-3">
                   <span className="text-3xl lg:text-5xl font-black text-success drop-shadow-sm">
-                    {formatCurrency(product.price * rate, currency)}
+                    {currentPriceFormatted}
                   </span>
                   {product.original_price && product.original_price > product.price && (
                     <span className="text-lg lg:text-xl text-muted-foreground/60 line-through font-medium">
-                      {formatCurrency(product.original_price * rate, currency)}
+                      {originalPriceFormatted}
                     </span>
                   )}
                 </div>
@@ -385,7 +390,7 @@ export default function ProductDetails() {
                 className="w-full text-lg font-bold py-6 shadow-strong hover:shadow-glow transition-all duration-300 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary"
               >
                 <ExternalLink className="mr-2 h-5 w-5" />
-                Buy Now - {formatCurrency(product.price * rate, currency)}
+                Buy Now - {buyNowPriceFormatted}
               </Button>
             </div>
           </div>
