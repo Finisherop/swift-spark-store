@@ -1,9 +1,10 @@
-import { ProductCard } from "./product-card";
+import { ProductCard as ImportedProductCard } from "./product-card";
 import { Loader2 } from "lucide-react";
 import { useCurrency } from "../CurrencyContext"; 
 import { formatPrice } from "../utils/currency";
 
-function ProductCard({ product }) {
+// Apne custom ProductCard ko alag naam do ya fir hata do
+function CustomProductCard({ product }) {
   const { currency, rate } = useCurrency();
   const convertedPrice = product.price * rate;
 
@@ -17,8 +18,6 @@ function ProductCard({ product }) {
     </div>
   );
 }
-
-export default ProductCard;
 
 interface Product {
   id: string;
@@ -87,10 +86,10 @@ export function ProductGrid({ products, loading, onViewDetails, onBuyNow }: Prod
               className="animate-fade-in"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <ProductCard
+              <ImportedProductCard
                 product={product}
-                onViewDetails={onViewDetails}
-                onBuyNow={onBuyNow}
+                onViewDetails={() => onViewDetails(product)}
+                onBuyNow={() => onBuyNow(product)}
               />
             </div>
           ))}
