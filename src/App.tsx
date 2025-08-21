@@ -9,14 +9,9 @@ import Index from "./pages/Index";
 import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
-import { useCurrency } from "@/utils/CurrencyContext"
-import { formatCurrency } from "@/utils/currency"
+import { CurrencyContext } from "@/utils/CurrencyContext";
+import { getUserCurrencyRate } from "@/utils/currency";
 
-const { currency } = useCurrency()
-
-<p className="font-bold">
-  {formatCurrency(product.price, currency)}
-</p>
 // QueryClient ko bahar define karo
 const queryClient = new QueryClient();
 
