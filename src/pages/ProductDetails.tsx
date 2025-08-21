@@ -10,7 +10,7 @@ import { ArrowLeft, ExternalLink, Star, Shield, Truck, RefreshCw, Share, Copy, C
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/utils/CurrencyContext";
-import { formatCurrency } from "@/utils/currency";
+import { convertAndFormatPrice } from "@/utils/currency";
 
 interface Product {
   id: string;

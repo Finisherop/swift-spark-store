@@ -21,6 +21,7 @@ interface Product {
   badge?: string;
   affiliate_link: string;
   images: string[];
+  currency: string;
   is_active: boolean;
 }
 
@@ -32,6 +33,15 @@ interface ProductFormProps {
 
 const categories = ['Fashion', 'Health & Fitness', 'Digital Products', 'Beauty'];
 const badges = ['New', 'Best Seller', 'Trending', 'Limited Stock'];
+const currencies = [
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' }
+];
 
 export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
   const [formData, setFormData] = useState({
@@ -44,6 +54,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     badge: '',
     affiliate_link: '',
     images: [] as string[],
+    currency: 'USD',
     is_active: true
   });
   const [loading, setLoading] = useState(false);
@@ -61,6 +72,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
         badge: product.badge || '',
         affiliate_link: product.affiliate_link,
         images: product.images,
+        currency: product.currency || 'USD', // Fallback for old products
         is_active: product.is_active
       });
     }
@@ -117,6 +129,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
         badge: formData.badge === 'none' ? null : formData.badge,
         affiliate_link: formData.affiliate_link,
         images: formData.images,
+        currency: formData.currency,
         is_active: formData.is_active
       };
 
@@ -204,30 +217,48 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
             </div>
 
             {/* Pricing */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
-                <Label htmlFor="price">Current Price ($) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  placeholder="0.00"
-                  required
-                />
+                <Label htmlFor="currency">Currency *</Label>
+                <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map((currency) => (
+                      <SelectItem key={currency.code} value={currency.code}>
+                        {currency.symbol} {currency.code} - {currency.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="price">Current Price ({currencies.find(c => c.code === formData.currency)?.symbol || '$'}) *</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="original_price">Original Price ($)</Label>
-                <Input
-                  id="original_price"
-                  type="number"
-                  step="0.01"
-                  value={formData.original_price}
-                  onChange={(e) => handleInputChange('original_price', e.target.value)}
-                  placeholder="0.00"
-                />
+                <div>
+                  <Label htmlFor="original_price">Original Price ({currencies.find(c => c.code === formData.currency)?.symbol || '$'})</Label>
+                  <Input
+                    id="original_price"
+                    type="number"
+                    step="0.01"
+                    value={formData.original_price}
+                    onChange={(e) => handleInputChange('original_price', e.target.value)}
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
             </div>
 

@@ -5,7 +5,7 @@ import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/utils/CurrencyContext";
-import { formatCurrency } from "@/utils/currency";
+import { convertAndFormatPrice } from "@/utils/currency";
 
 interface Product {
   id: string;
@@ -18,6 +18,7 @@ interface Product {
   badge?: string;
   affiliate_link: string;
   images: string[];
+  currency?: string;
 }
 
 interface ProductCardProps {
@@ -30,7 +31,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
-  const { currency, rate } = useCurrency();
+  const { currency, exchangeRates } = useCurrency();
 
   // Auto-swipe images every 3 seconds
   useEffect(() => {
@@ -68,7 +69,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/product/${product.id}`;
-    const shareText = `Check out this amazing product: ${product.name} - Only ${formatCurrency(product.price * rate, currency)}!`;
+    const shareText = `Check out this amazing product: ${product.name} - Only ${convertAndFormatPrice(product.price, product.currency || 'USD', currency, exchangeRates)}!`;
     
     if (navigator.share) {
       try {
@@ -194,11 +195,11 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         {/* Price Section */}
         <div className="flex items-center space-x-2">
           <span className="text-2xl font-bold text-primary">
-            {formatCurrency(product.price * rate, currency)}
+            {convertAndFormatPrice(product.price, product.currency || 'USD', currency, exchangeRates)}
           </span>
           {product.original_price && product.original_price > product.price && (
             <span className="text-sm text-muted-foreground line-through">
-              {formatCurrency(product.original_price * rate, currency)}
+              {convertAndFormatPrice(product.original_price, product.currency || 'USD', currency, exchangeRates)}
             </span>
           )}
         </div>

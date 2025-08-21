@@ -29,6 +29,7 @@ interface Product {
   badge?: string;
   affiliate_link: string;
   images: string[];
+  currency: string;
   is_active: boolean;
   created_at: string;
 }
