@@ -12,6 +12,9 @@ import { useEffect, useState } from "react";
 import { CurrencyContext } from "./CurrencyContext";
 import { getUserCurrencyRate } from "./utils/currency";
 
+// QueryClient ko bahar define karo
+const queryClient = new QueryClient();
+
 function App() {
   const [currency, setCurrency] = useState("INR");
   const [rate, setRate] = useState(1);
@@ -27,34 +30,26 @@ function App() {
 
   return (
     <CurrencyContext.Provider value={{ currency, rate }}>
-      {/* 👇 Tumhara purana pura App code as it is */}
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
     </CurrencyContext.Provider>
   );
 }
-
-export default App;
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/product/:id" element={<ProductDetails />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
-);
 
 export default App;
