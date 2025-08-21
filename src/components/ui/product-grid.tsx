@@ -1,8 +1,7 @@
 import { ProductCard as ImportedProductCard } from "./product-card";
 import { Loader2 } from "lucide-react";
-import { useCurrency } from "../CurrencyContext";
-import { formatPrice } from "../utils/currency";
-
+import { formatCurrency, convertPrice } from "@/utils/currency"
+import { CurrencyProvider, useCurrency } from "@/utils/CurrencyContext"
 interface Product {
   id: string;
   name: string;
