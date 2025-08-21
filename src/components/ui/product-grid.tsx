@@ -1,23 +1,7 @@
 import { ProductCard as ImportedProductCard } from "./product-card";
 import { Loader2 } from "lucide-react";
-import { useCurrency } from "../CurrencyContext"; 
+import { useCurrency } from "../CurrencyContext";
 import { formatPrice } from "../utils/currency";
-
-// Apne custom ProductCard ko alag naam do ya fir hata do
-function CustomProductCard({ product }) {
-  const { currency, rate } = useCurrency();
-  const convertedPrice = product.price * rate;
-
-  return (
-    <div className="p-4 border rounded-xl">
-      <h2 className="font-bold text-lg">{product.title}</h2>
-      <p className="text-sm text-gray-500">{product.description}</p>
-      <p className="text-xl font-semibold text-green-600">
-        {formatPrice(convertedPrice, currency)}
-      </p>
-    </div>
-  );
-}
 
 interface Product {
   id: string;
@@ -39,7 +23,14 @@ interface ProductGridProps {
   onBuyNow: (product: Product) => void;
 }
 
-export function ProductGrid({ products, loading, onViewDetails, onBuyNow }: ProductGridProps) {
+export function ProductGrid({
+  products,
+  loading,
+  onViewDetails,
+  onBuyNow,
+}: ProductGridProps) {
+  const { currency, rate } = useCurrency();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -80,22 +71,37 @@ export function ProductGrid({ products, loading, onViewDetails, onBuyNow }: Prod
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-            <div
-              key={product.id}
-              className="animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <ImportedProductCard
-                product={product}
-                onViewDetails={() => onViewDetails(product)}
-                onBuyNow={() => onBuyNow(product)}
-              />
-            </div>
-          ))}
+          {products.map((product, index) => {
+            const convertedPrice = product.price * rate;
+            const convertedOriginalPrice = product.original_price
+              ? product.original_price * rate
+              : null;
+
+            return (
+              <div
+                key={product.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <ImportedProductCard
+                  product={{
+                    ...product,
+                    price: convertedPrice,
+                    original_price: convertedOriginalPrice || undefined,
+                    formattedPrice: formatPrice(convertedPrice, currency),
+                    formattedOriginalPrice: convertedOriginalPrice
+                      ? formatPrice(convertedOriginalPrice, currency)
+                      : undefined,
+                  }}
+                  onViewDetails={() => onViewDetails(product)}
+                  onBuyNow={() => onBuyNow(product)}
+                />
+              </div>
+            );
+          })}
         </div>
 
-        {/* Load More Section (for future enhancement) */}
+        {/* Load More Section */}
         {products.length > 0 && (
           <div className="text-center mt-12">
             <p className="text-muted-foreground">
