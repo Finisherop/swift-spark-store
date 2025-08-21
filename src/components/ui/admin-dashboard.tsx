@@ -290,7 +290,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           {product.short_description}
                         </p>
                         <div className="flex items-center space-x-4 text-sm">
-                          <span className="font-semibold">₹{product.price.toLocaleString()}</span>
+                          <span className="font-semibold">${product.price}</span>
+                          {product.original_price && product.original_price > product.price && (
+                            <span className="text-muted-foreground line-through">${product.original_price}</span>
+                          )}
                           <span className="text-muted-foreground">{product.category}</span>
                           <span className="text-muted-foreground">
                             {new Date(product.created_at).toLocaleDateString()}
