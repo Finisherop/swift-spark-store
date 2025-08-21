@@ -1,8 +1,12 @@
-// src/utils/currency.ts
-export function formatCurrency(value: number, currency: string = "INR") {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 0,
-  }).format(value);
+export function formatCurrency(amount: number, currency: string = "INR") {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${currency} ${amount}`;
+  }
 }
