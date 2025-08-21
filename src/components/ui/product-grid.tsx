@@ -1,5 +1,24 @@
 import { ProductCard } from "./product-card";
 import { Loader2 } from "lucide-react";
+import { useCurrency } from "../CurrencyContext"; 
+import { formatPrice } from "../utils/currency";
+
+function ProductCard({ product }) {
+  const { currency, rate } = useCurrency();
+  const convertedPrice = product.price * rate;
+
+  return (
+    <div className="p-4 border rounded-xl">
+      <h2 className="font-bold text-lg">{product.title}</h2>
+      <p className="text-sm text-gray-500">{product.description}</p>
+      <p className="text-xl font-semibold text-green-600">
+        {formatPrice(convertedPrice, currency)}
+      </p>
+    </div>
+  );
+}
+
+export default ProductCard;
 
 interface Product {
   id: string;
