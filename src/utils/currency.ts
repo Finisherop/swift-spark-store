@@ -1,6 +1,8 @@
-export function formatPrice(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-US", {
+// src/utils/currency.ts
+export function formatCurrency(value: number, currency: string = "INR") {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency,
-  }).format(amount);
+    minimumFractionDigits: 0,
+  }).format(value);
 }
