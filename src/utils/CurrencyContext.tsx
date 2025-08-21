@@ -7,7 +7,7 @@ interface CurrencyContextType {
   rate: number;
 }
 
-const CurrencyContext = createContext<CurrencyContextType>({
+export const CurrencyContext = createContext<CurrencyContextType>({
   currency: "USD",
   rate: 1,
 });

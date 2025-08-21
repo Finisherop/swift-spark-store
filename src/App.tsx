@@ -8,28 +8,14 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
-import { useEffect, useState } from "react";
-import { CurrencyContext } from "@/utils/CurrencyContext";
-import { getUserCurrencyRate } from "@/utils/currency";
+import { CurrencyProvider } from "@/utils/CurrencyContext";
 
 // QueryClient ko bahar define karo
 const queryClient = new QueryClient();
 
 function App() {
-  const [currency, setCurrency] = useState("INR");
-  const [rate, setRate] = useState(1);
-
-  useEffect(() => {
-    async function fetchCurrency() {
-      const { currency, rate } = await getUserCurrencyRate();
-      setCurrency(currency);
-      setRate(rate);
-    }
-    fetchCurrency();
-  }, []);
-
   return (
-    <CurrencyContext.Provider value={{ currency, rate }}>
+    <CurrencyProvider>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
@@ -48,7 +34,7 @@ function App() {
           </AuthProvider>
         </QueryClientProvider>
       </HelmetProvider>
-    </CurrencyContext.Provider>
+    </CurrencyProvider>
   );
 }
 
