@@ -8,6 +8,31 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
+import { useEffect, useState } from "react";
+import { CurrencyContext } from "./CurrencyContext";
+import { getUserCurrencyRate } from "./utils/currency";
+
+function App() {
+  const [currency, setCurrency] = useState("INR");
+  const [rate, setRate] = useState(1);
+
+  useEffect(() => {
+    async function fetchCurrency() {
+      const { currency, rate } = await getUserCurrencyRate();
+      setCurrency(currency);
+      setRate(rate);
+    }
+    fetchCurrency();
+  }, []);
+
+  return (
+    <CurrencyContext.Provider value={{ currency, rate }}>
+      {/* 👇 Tumhara purana pura App code as it is */}
+    </CurrencyContext.Provider>
+  );
+}
+
+export default App;
 
 const queryClient = new QueryClient();
 
