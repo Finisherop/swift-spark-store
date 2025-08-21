@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { ProductGrid } from "@/components/ui/product-grid";
 import { Header } from "@/components/ui/header";
-import { ArrowLeft, ExternalLink, Star, Shield, Truck, RefreshCw } from "lucide-react";
+import { ArrowLeft, ExternalLink, Star, Shield, Truck, RefreshCw, Share, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
@@ -25,9 +27,11 @@ interface Product {
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [product, setProduct] = useState<Product | null>(null);
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -127,6 +131,46 @@ export default function ProductDetails() {
     }
   };
 
+  const handleShareProduct = async () => {
+    const productUrl = `${window.location.origin}/product/${product?.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product?.name,
+          text: product?.short_description,
+          url: productUrl,
+        });
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    } else {
+      await handleCopyLink();
+    }
+  };
+
+  const handleCopyLink = async () => {
+    const productUrl = `${window.location.origin}/product/${product?.id}`;
+    
+    try {
+      await navigator.clipboard.writeText(productUrl);
+      setCopied(true);
+      toast({
+        title: "Link Copied!",
+        description: "Product link copied to clipboard",
+      });
+      
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy link to clipboard",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen">
@@ -169,6 +213,44 @@ export default function ProductDetails() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{product?.name ? `${product.name} - SwiftMart` : 'SwiftMart'}</title>
+        <meta name="description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
+        
+        {/* Open Graph Meta Tags */}
+        <meta property="og:title" content={product?.name || 'SwiftMart'} />
+        <meta property="og:description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={`${window.location.origin}/product/${product?.id}`} />
+        {product?.images?.[0] && <meta property="og:image" content={product.images[0]} />}
+        
+        {/* Twitter Card Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={product?.name || 'SwiftMart'} />
+        <meta name="twitter:description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
+        {product?.images?.[0] && <meta name="twitter:image" content={product.images[0]} />}
+        
+        {/* Product Schema */}
+        {product && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org/",
+              "@type": "Product",
+              "name": product.name,
+              "description": product.description || product.short_description,
+              "image": product.images,
+              "offers": {
+                "@type": "Offer",
+                "url": `${window.location.origin}/product/${product.id}`,
+                "priceCurrency": "INR",
+                "price": product.price,
+                "availability": "https://schema.org/InStock"
+              }
+            })}
+          </script>
+        )}
+      </Helmet>
+
       <Header 
         onSearch={() => {}} 
         onFilterChange={() => {}} 
@@ -188,9 +270,9 @@ export default function ProductDetails() {
         </Button>
 
         {/* Product Details Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Left: Image Carousel */}
-          <div className="animate-fade-in">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
+          {/* Left: Image Carousel - Mobile First */}
+          <div className="animate-fade-in order-1 lg:order-1">
             <ImageCarousel 
               images={product.images} 
               alt={product.name}
@@ -199,73 +281,103 @@ export default function ProductDetails() {
             />
           </div>
 
-          {/* Right: Product Info */}
-          <div className="space-y-6 animate-slide-up">
-            {/* Title */}
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-3">
+          {/* Right: Product Info - Highlighted Content */}
+          <div className="space-y-8 animate-slide-up order-2 lg:order-2">
+            {/* Title - Prominently Highlighted */}
+            <div className="bg-gradient-to-r from-primary-light/20 to-transparent p-6 rounded-2xl border-l-4 border-l-primary">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight mb-4 text-foreground bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
                 {product.name}
               </h1>
-              <p className="text-lg text-muted-foreground">
-                {product.short_description}
-              </p>
+              <div className="bg-accent/30 p-4 rounded-xl">
+                <p className="text-base lg:text-lg font-semibold text-accent-foreground leading-relaxed">
+                  {product.short_description}
+                </p>
+              </div>
             </div>
 
-            {/* Price Section */}
-            <div className="flex items-center space-x-4">
-              <span className="text-4xl font-bold text-primary">
-                ₹{product.price.toLocaleString()}
-              </span>
-              {product.original_price && product.original_price > product.price && (
-                <>
-                  <span className="text-xl text-muted-foreground line-through">
-                    ₹{product.original_price.toLocaleString()}
+            {/* Price Section - Bold and Prominent */}
+            <div className="bg-gradient-to-br from-success/10 to-success/5 p-6 rounded-2xl border border-success/20 shadow-soft">
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <div className="flex items-baseline space-x-3">
+                  <span className="text-3xl lg:text-5xl font-black text-success drop-shadow-sm">
+                    ₹{product.price.toLocaleString()}
                   </span>
-                  <Badge variant="destructive" className="text-sm">
+                  {product.original_price && product.original_price > product.price && (
+                    <span className="text-lg lg:text-xl text-muted-foreground/60 line-through font-medium">
+                      ₹{product.original_price.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+                {product.discount_percentage > 0 && (
+                  <Badge variant="destructive" className="text-sm font-bold px-3 py-1 shadow-soft">
                     Save {product.discount_percentage}%
                   </Badge>
-                </>
-              )}
+                )}
+              </div>
             </div>
 
-            {/* Badges */}
-            <div className="flex flex-wrap gap-2">
-              {product.badge && (
-                <Badge variant={getBadgeVariant(product.badge)} className="text-sm px-3 py-1">
-                  {product.badge}
+            {/* Badges and Share */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap gap-2">
+                {product.badge && (
+                  <Badge variant={getBadgeVariant(product.badge)} className="text-sm px-3 py-1 font-semibold">
+                    {product.badge}
+                  </Badge>
+                )}
+                <Badge variant="outline" className="text-sm px-3 py-1 font-medium">
+                  {product.category}
                 </Badge>
-              )}
-              <Badge variant="outline" className="text-sm px-3 py-1">
-                {product.category}
-              </Badge>
+              </div>
+              
+              {/* Share Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleShareProduct}
+                  className="flex items-center gap-2 font-medium"
+                >
+                  <Share className="h-4 w-4" />
+                  Share
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-2 font-medium"
+                >
+                  {copied ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+                  {copied ? 'Copied!' : 'Copy Link'}
+                </Button>
+              </div>
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Shield className="h-4 w-4 text-primary" />
+            <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-xl">
+              <div className="flex items-center space-x-2 text-sm font-medium">
+                <Shield className="h-5 w-5 text-primary" />
                 <span>Quality Assured</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Truck className="h-4 w-4 text-primary" />
+              <div className="flex items-center space-x-2 text-sm font-medium">
+                <Truck className="h-5 w-5 text-primary" />
                 <span>Fast Delivery</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <RefreshCw className="h-4 w-4 text-primary" />
+              <div className="flex items-center space-x-2 text-sm font-medium">
+                <RefreshCw className="h-5 w-5 text-primary" />
                 <span>Easy Returns</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Star className="h-4 w-4 text-primary" />
+              <div className="flex items-center space-x-2 text-sm font-medium">
+                <Star className="h-5 w-5 text-primary" />
                 <span>Trusted Brand</span>
               </div>
             </div>
 
             {/* Buy Now Button */}
-            <div className="sticky bottom-0 bg-background/95 backdrop-blur-sm p-4 -mx-4 lg:static lg:bg-transparent lg:p-0">
+            <div className="sticky bottom-4 bg-background/95 backdrop-blur-sm p-4 -mx-4 lg:static lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
               <Button
                 size="lg"
                 onClick={handleBuyNow}
-                className="w-full text-lg py-6 shadow-strong hover:shadow-glow transition-all duration-300"
+                className="w-full text-lg font-bold py-6 shadow-strong hover:shadow-glow transition-all duration-300 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary"
               >
                 <ExternalLink className="mr-2 h-5 w-5" />
                 Buy Now - ₹{product.price.toLocaleString()}
@@ -274,23 +386,29 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        {/* Product Description */}
+        {/* Product Description - Highlighted */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-6">Product Details</h2>
-          <div className="prose prose-lg max-w-none">
-            <div className="bg-card rounded-xl p-6 shadow-soft">
-              {product.description ? (
-                <div 
-                  className="text-muted-foreground leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
-                    __html: product.description.replace(/\n/g, '<br/>') 
-                  }}
-                />
-              ) : (
-                <p className="text-muted-foreground">
-                  {product.short_description}
-                </p>
-              )}
+          <div className="bg-gradient-to-r from-accent/20 to-transparent p-1 rounded-2xl">
+            <div className="bg-background rounded-2xl p-8 shadow-medium border border-accent/30">
+              <h2 className="text-2xl lg:text-3xl font-black mb-6 text-foreground bg-gradient-to-r from-accent-foreground to-muted-foreground bg-clip-text text-transparent">
+                Product Details
+              </h2>
+              <div className="prose prose-lg max-w-none">
+                <div className="bg-muted/20 rounded-xl p-6 border-l-4 border-l-accent">
+                  {product.description ? (
+                    <div 
+                      className="text-foreground leading-relaxed text-base lg:text-lg font-medium"
+                      dangerouslySetInnerHTML={{ 
+                        __html: product.description.replace(/\n/g, '<br/>') 
+                      }}
+                    />
+                  ) : (
+                    <p className="text-foreground leading-relaxed text-base lg:text-lg font-medium">
+                      {product.short_description}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
