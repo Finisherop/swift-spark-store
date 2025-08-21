@@ -4,6 +4,8 @@ import { Badge } from "./badge";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/utils/CurrencyContext";
+import { formatCurrency } from "@/utils/currency";
 
 interface Product {
   id: string;
@@ -28,6 +30,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const { currency, rate } = useCurrency();
 
   // Auto-swipe images every 3 seconds
   useEffect(() => {
@@ -65,7 +68,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/product/${product.id}`;
-    const shareText = `Check out this amazing product: ${product.name} - Only ₹${product.price}!`;
+    const shareText = `Check out this amazing product: ${product.name} - Only ${formatCurrency(product.price * rate, currency)}!`;
     
     if (navigator.share) {
       try {
@@ -191,11 +194,11 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         {/* Price Section */}
         <div className="flex items-center space-x-2">
           <span className="text-2xl font-bold text-primary">
-            ₹{product.price.toLocaleString()}
+            {formatCurrency(product.price * rate, currency)}
           </span>
           {product.original_price && product.original_price > product.price && (
             <span className="text-sm text-muted-foreground line-through">
-              ₹{product.original_price.toLocaleString()}
+              {formatCurrency(product.original_price * rate, currency)}
             </span>
           )}
         </div>

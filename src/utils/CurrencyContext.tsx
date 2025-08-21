@@ -33,9 +33,12 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         const rateData = await rateRes.json();
 
         setCurrency(userCurrency);
-        setRate(rateData.rates[userCurrency] || 1);
+        setRate((rateData.rates && rateData.rates[userCurrency]) || 1);
       } catch (error) {
         console.error("Currency fetch error:", error);
+        // Fallback to USD if currency detection fails
+        setCurrency("USD");
+        setRate(1);
       }
     }
 

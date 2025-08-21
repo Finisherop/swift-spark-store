@@ -87,9 +87,9 @@ export function ProductGrid({
                     ...product,
                     price: convertedPrice,
                     original_price: convertedOriginalPrice || undefined,
-                    formattedPrice: formatPrice(convertedPrice, currency),
+                    formattedPrice: formatCurrency(convertedPrice, currency),
                     formattedOriginalPrice: convertedOriginalPrice
-                      ? formatPrice(convertedOriginalPrice, currency)
+                      ? formatCurrency(convertedOriginalPrice, currency)
                       : undefined,
                   }}
                   onViewDetails={() => onViewDetails(product)}
