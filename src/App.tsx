@@ -8,6 +8,8 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import ProductDetails from "./pages/ProductDetails";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/product/:id" element={<ProductDetails />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/privacy" element={<Privacy />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <Toaster />

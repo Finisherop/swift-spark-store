@@ -42,10 +42,6 @@ export function Header({
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-soft">
         <div className="container mx-auto px-4">
-          {/* Welcome Message */}
-          <div className="py-2 text-center bg-primary/5 text-sm text-muted-foreground">
-            🎉 Welcome to SwiftMart! Discover amazing products at unbeatable prices 🛍️
-          </div>
 
           {/* Main Header */}
           <div className="flex h-16 items-center justify-between">

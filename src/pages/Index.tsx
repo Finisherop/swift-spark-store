@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/ui/header";
+import { Navigation } from "@/components/ui/navigation";
 import { HeroSection } from "@/components/ui/hero-section";
 import { SearchCategorySection } from "@/components/ui/search-category-section";
 import { ProductGrid } from "@/components/ui/product-grid";
@@ -184,6 +185,8 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navigation />
+      
       <Header
         onSearch={setSearchQuery}
         onFilterChange={setSelectedCategory}
