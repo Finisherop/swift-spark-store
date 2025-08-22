@@ -35,8 +35,8 @@ export default function ProductDetails() {
   const [copied, setCopied] = useState(false);
   
   // Local currency conversion
-  const { localPrice, currencyCode, currencySymbol, exchangeRate } = useLocalCurrency(product?.price || 0);
-  const { localPrice: originalLocalPrice } = useLocalCurrency(product?.original_price || 0);
+  const { price: localPrice, currencyCode, currencySymbol } = useLocalCurrency(product?.price || 0);
+  const { price: originalLocalPrice } = useLocalCurrency(product?.original_price || 0);
 
   useEffect(() => {
     if (id) {

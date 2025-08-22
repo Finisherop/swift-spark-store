@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { COUNTRY_TO_CURRENCY, CURRENCY_SYMBOLS } from '@/utils/currencyMapping';
 
 interface CurrencyData {
-  localPrice: number;
+  price: number;
   currencyCode: string;
   currencySymbol: string;
-  exchangeRate: number;
 }
 
 interface GeolocationData {
@@ -13,16 +12,48 @@ interface GeolocationData {
   currency?: string;
 }
 
+interface CachedCurrencyData {
+  currencyCode: string;
+  currencySymbol: string;
+  exchangeRate: number;
+  timestamp: number;
+}
+
 export function useLocalCurrency(usdPrice: number): CurrencyData {
   const [currencyData, setCurrencyData] = useState<CurrencyData>({
-    localPrice: usdPrice,
+    price: usdPrice,
     currencyCode: 'USD',
-    currencySymbol: '$',
-    exchangeRate: 1
+    currencySymbol: '$'
   });
 
   useEffect(() => {
     async function detectAndSetCurrency() {
+      // Check localStorage cache first
+      const cacheKey = 'swiftmart_currency_cache';
+      const cached = localStorage.getItem(cacheKey);
+      
+      if (cached) {
+        try {
+          const cachedData: CachedCurrencyData = JSON.parse(cached);
+          const now = Date.now();
+          const cacheAge = now - cachedData.timestamp;
+          const cacheExpiryHours = 12;
+          
+          // If cache is still valid (less than 12 hours)
+          if (cacheAge < cacheExpiryHours * 60 * 60 * 1000) {
+            const price = usdPrice * cachedData.exchangeRate;
+            setCurrencyData({
+              price,
+              currencyCode: cachedData.currencyCode,
+              currencySymbol: cachedData.currencySymbol
+            });
+            return;
+          }
+        } catch (error) {
+          console.error('Error parsing cached currency data:', error);
+        }
+      }
+
       try {
         // Step 1: Detect user's country
         const geoResponse = await fetch('https://ipapi.co/json/');
@@ -42,25 +73,32 @@ export function useLocalCurrency(usdPrice: number): CurrencyData {
           exchangeRate = rateData.rates?.[currencyCode] || 1;
         }
         
-        // Step 4: Calculate local price
-        const localPrice = usdPrice * exchangeRate;
-        const currencySymbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
+        // Step 4: Calculate price and get symbol
+        const price = usdPrice * exchangeRate;
+        const currencySymbol = CURRENCY_SYMBOLS[currencyCode] || '$';
         
-        setCurrencyData({
-          localPrice,
+        // Cache the result for 12 hours
+        const cacheData: CachedCurrencyData = {
           currencyCode,
           currencySymbol,
-          exchangeRate
+          exchangeRate,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+        
+        setCurrencyData({
+          price,
+          currencyCode,
+          currencySymbol
         });
         
       } catch (error) {
         console.error('Currency detection failed:', error);
         // Fallback to USD
         setCurrencyData({
-          localPrice: usdPrice,
+          price: usdPrice,
           currencyCode: 'USD',
-          currencySymbol: '$',
-          exchangeRate: 1
+          currencySymbol: '$'
         });
       }
     }

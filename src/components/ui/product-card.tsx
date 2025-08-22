@@ -31,8 +31,8 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
   const { toast } = useToast();
   
   // Get local currency data
-  const { localPrice, currencySymbol, currencyCode } = useLocalCurrency(product.price);
-  const originalLocalPrice = product.original_price ? useLocalCurrency(product.original_price).localPrice : null;
+  const { price: localPrice, currencySymbol, currencyCode } = useLocalCurrency(product.price);
+  const { price: originalLocalPrice } = useLocalCurrency(product.original_price || 0);
 
   // Auto-swipe images every 3 seconds
   useEffect(() => {
@@ -198,7 +198,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
           <span className="text-2xl font-bold text-primary">
             {currencySymbol}{Math.round(localPrice).toLocaleString()}
           </span>
-          {originalLocalPrice && originalLocalPrice > localPrice && (
+          {product.original_price && product.original_price > product.price && (
             <span className="text-sm text-muted-foreground line-through">
               {currencySymbol}{Math.round(originalLocalPrice).toLocaleString()}
             </span>
