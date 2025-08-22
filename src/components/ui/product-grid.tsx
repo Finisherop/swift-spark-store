@@ -1,7 +1,5 @@
 import { ProductCard as ImportedProductCard } from "./product-card";
 import { Loader2 } from "lucide-react";
-import { formatCurrency } from "@/utils/currency"
-import { CurrencyProvider, useCurrency } from "@/utils/CurrencyContext"
 interface Product {
   id: string;
   name: string;
@@ -28,7 +26,6 @@ export function ProductGrid({
   onViewDetails,
   onBuyNow,
 }: ProductGridProps) {
-  const { currency, rate } = useCurrency();
 
   if (loading) {
     return (
@@ -70,34 +67,19 @@ export function ProductGrid({
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product, index) => {
-            const convertedPrice = product.price * rate;
-            const convertedOriginalPrice = product.original_price
-              ? product.original_price * rate
-              : null;
-
-            return (
-              <div
-                key={product.id}
-                className="animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <ImportedProductCard
-                  product={{
-                    ...product,
-                    price: convertedPrice,
-                    original_price: convertedOriginalPrice || undefined,
-                    formattedPrice: formatPrice(convertedPrice, currency),
-                    formattedOriginalPrice: convertedOriginalPrice
-                      ? formatPrice(convertedOriginalPrice, currency)
-                      : undefined,
-                  }}
-                  onViewDetails={() => onViewDetails(product)}
-                  onBuyNow={() => onBuyNow(product)}
-                />
-              </div>
-            );
-          })}
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <ImportedProductCard
+                product={product}
+                onViewDetails={() => onViewDetails(product)}
+                onBuyNow={() => onBuyNow(product)}
+              />
+            </div>
+          ))}
         </div>
 
         {/* Load More Section */}
