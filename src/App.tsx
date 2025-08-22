@@ -17,24 +17,14 @@ const queryClient = new QueryClient();
 
 function App() {
   useEffect(() => {
-    // ✅ Set cuelinks ID globally
-    (window as any).cId = "243605";
-
-    const s = document.createElement("script");
-    s.type = "text/javascript";
+    var cId = '243605';
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
     s.async = true;
-    s.src =
-      (document.location.protocol === "https:"
-        ? "https://cdn0.cuelinks.com/js/"
-        : "http://cdn0.cuelinks.com/js/") + "cuelinksv2.js";
-
+    s.src = (document.location.protocol === 'https:' 
+      ? 'https://cdn0.cuelinks.com/js/' 
+      : 'http://cdn0.cuelinks.com/js/') + 'cuelinksv2.js';
     document.body.appendChild(s);
-
-    return () => {
-      if (s && document.body.contains(s)) {
-        document.body.removeChild(s);
-      }
-    };
   }, []);
 
   return (
