@@ -9,8 +9,7 @@ import { Header } from "@/components/ui/header";
 import { ArrowLeft, ExternalLink, Star, Shield, Truck, RefreshCw, Share, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useCurrency } from "@/utils/CurrencyContext";
-import { formatCurrency } from "@/utils/currency";
+import { useLocalCurrency } from "@/hooks/useLocalCurrency";
 
 interface Product {
   id: string;
@@ -35,8 +34,9 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   
-  // Currency context
-  const { currency, rate } = useCurrency();
+  // Local currency conversion
+  const { localPrice, currencyCode, currencySymbol, exchangeRate } = useLocalCurrency(product?.price || 0);
+  const { localPrice: originalLocalPrice } = useLocalCurrency(product?.original_price || 0);
 
   useEffect(() => {
     if (id) {
@@ -247,8 +247,8 @@ export default function ProductDetails() {
               "offers": {
                 "@type": "Offer",
                 "url": `${window.location.origin}/product/${product.id}`,
-                "priceCurrency": currency,
-                "price": product.price * rate,
+                "priceCurrency": currencyCode,
+                "price": localPrice,
                 "availability": "https://schema.org/InStock"
               }
             })}
@@ -305,11 +305,11 @@ export default function ProductDetails() {
               <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                 <div className="flex items-baseline space-x-3">
                   <span className="text-3xl lg:text-5xl font-black text-success drop-shadow-sm">
-                    {formatCurrency(product.price * rate, currency)}
+                    {currencySymbol}{Math.round(localPrice)}
                   </span>
                   {product.original_price && product.original_price > product.price && (
                     <span className="text-lg lg:text-xl text-muted-foreground/60 line-through font-medium">
-                      {formatCurrency(product.original_price * rate, currency)}
+                      {currencySymbol}{Math.round(originalLocalPrice)}
                     </span>
                   )}
                 </div>
@@ -385,7 +385,7 @@ export default function ProductDetails() {
                 className="w-full text-lg font-bold py-6 shadow-strong hover:shadow-glow transition-all duration-300 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary"
               >
                 <ExternalLink className="mr-2 h-5 w-5" />
-                Buy Now - {formatCurrency(product.price * rate, currency)}
+                Buy Now - {currencySymbol}{Math.round(localPrice)}
               </Button>
             </div>
           </div>
