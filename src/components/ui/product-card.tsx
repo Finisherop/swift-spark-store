@@ -4,7 +4,7 @@ import { Badge } from "./badge";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+
 
 interface Product {
   id: string;
@@ -30,9 +30,6 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   
-  // Get local currency data
-  const { price: localPrice, currencySymbol, currencyCode } = useLocalCurrency(product.price);
-  const { price: originalLocalPrice } = useLocalCurrency(product.original_price || 0);
 
   // Auto-swipe images every 3 seconds
   useEffect(() => {
@@ -70,7 +67,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/product/${product.id}`;
-    const shareText = `Check out this amazing product: ${product.name} - Only ${currencySymbol}${Math.round(localPrice).toLocaleString()}!`;
+    const shareText = `Check out this amazing product: ${product.name} - Only $${Math.round(product.price).toLocaleString()}!`;
     
     if (navigator.share) {
       try {
@@ -196,11 +193,11 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         {/* Price Section */}
         <div className="flex items-center space-x-2">
           <span className="text-2xl font-bold text-primary">
-            {currencySymbol}{Math.round(localPrice).toLocaleString()}
+            ${Math.round(product.price).toLocaleString()}
           </span>
           {product.original_price && product.original_price > product.price && (
             <span className="text-sm text-muted-foreground line-through">
-              {currencySymbol}{Math.round(originalLocalPrice).toLocaleString()}
+              ${Math.round(product.original_price).toLocaleString()}
             </span>
           )}
         </div>

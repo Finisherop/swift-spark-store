@@ -9,7 +9,7 @@ import { Header } from "@/components/ui/header";
 import { ArrowLeft, ExternalLink, Star, Shield, Truck, RefreshCw, Share, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useLocalCurrency } from "@/hooks/useLocalCurrency";
+
 
 interface Product {
   id: string;
@@ -34,9 +34,6 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   
-  // Local currency conversion
-  const { price: localPrice, currencyCode, currencySymbol } = useLocalCurrency(product?.price || 0);
-  const { price: originalLocalPrice } = useLocalCurrency(product?.original_price || 0);
 
   useEffect(() => {
     if (id) {
@@ -247,8 +244,8 @@ export default function ProductDetails() {
               "offers": {
                 "@type": "Offer",
                 "url": `${window.location.origin}/product/${product.id}`,
-                "priceCurrency": currencyCode,
-                "price": localPrice,
+                "priceCurrency": "USD",
+                "price": product.price,
                 "availability": "https://schema.org/InStock"
               }
             })}
@@ -303,16 +300,16 @@ export default function ProductDetails() {
             {/* Price Section - Bold and Prominent */}
             <div className="bg-gradient-to-br from-success/10 to-success/5 p-6 rounded-2xl border border-success/20 shadow-soft">
               <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                <div className="flex items-baseline space-x-3">
-                  <span className="text-3xl lg:text-5xl font-black text-success drop-shadow-sm">
-                    {currencySymbol}{Math.round(localPrice)}
-                  </span>
-                  {product.original_price && product.original_price > product.price && (
-                    <span className="text-lg lg:text-xl text-muted-foreground/60 line-through font-medium">
-                      {currencySymbol}{Math.round(originalLocalPrice)}
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-4xl font-bold text-primary">
+                      ${Math.round(product.price)}
                     </span>
-                  )}
-                </div>
+                    {product.original_price && product.original_price > product.price && (
+                      <span className="text-xl text-muted-foreground line-through">
+                        ${Math.round(product.original_price)}
+                      </span>
+                    )}
+                  </div>
                 {product.discount_percentage > 0 && (
                   <Badge variant="destructive" className="text-sm font-bold px-3 py-1 shadow-soft">
                     Save {product.discount_percentage}%
@@ -385,7 +382,7 @@ export default function ProductDetails() {
                 className="w-full text-lg font-bold py-6 shadow-strong hover:shadow-glow transition-all duration-300 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary"
               >
                 <ExternalLink className="mr-2 h-5 w-5" />
-                Buy Now - {currencySymbol}{Math.round(localPrice)}
+                Buy Now - ${Math.round(product.price)}
               </Button>
             </div>
           </div>
