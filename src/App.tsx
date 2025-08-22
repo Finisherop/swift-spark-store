@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,17 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    var cId = '243605';
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.async = true;
+    s.src = (document.location.protocol === 'https:' 
+      ? 'https://cdn0.cuelinks.com/js/' 
+      : 'http://cdn0.cuelinks.com/js/') + 'cuelinksv2.js';
+    document.body.appendChild(s);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
