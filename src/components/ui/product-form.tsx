@@ -206,7 +206,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
             {/* Pricing */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="price">Current Price (₹) *</Label>
+                <Label htmlFor="price">Current Price ($) *</Label>
                 <Input
                   id="price"
                   type="number"
@@ -219,7 +219,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="original_price">Original Price (₹)</Label>
+                <Label htmlFor="original_price">Original Price ($)</Label>
                 <Input
                   id="original_price"
                   type="number"
