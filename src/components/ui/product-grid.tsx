@@ -11,6 +11,11 @@ interface Product {
   badge?: string;
   affiliate_link: string;
   images: string[];
+  is_amazon_product?: boolean;
+  amazon_affiliate_link?: string;
+  amazon_image_url?: string;
+  short_description_amazon?: string;
+  long_description_amazon?: string;
 }
 
 interface ProductGridProps {
@@ -57,11 +62,18 @@ export function ProductGrid({
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Our <span className="text-gradient">Featured Products</span>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-800">
+            {products.some(p => p.is_amazon_product) ? (
+              <>Amazon <span className="text-gradient">Products</span></>
+            ) : (
+              <>Our <span className="text-gradient">Featured Products</span></>
+            )}
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Discover our carefully curated collection of premium products at unbeatable prices
+          <p className="text-slate-600 max-w-2xl mx-auto">
+            {products.some(p => p.is_amazon_product) 
+              ? "Discover quality products available on Amazon with our curated selection"
+              : "Discover our carefully curated collection of premium products at unbeatable prices"
+            }
           </p>
         </div>
 
