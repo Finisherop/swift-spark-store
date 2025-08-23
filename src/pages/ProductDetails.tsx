@@ -295,19 +295,7 @@ export default function ProductDetails() {
                   autoPlay={true}
                   interval={5000}
                 />
-                
-                {/* Professional Badge Overlay */}
-                {product.is_amazon_product && (
-                  <div className="absolute top-6 left-6 z-10">
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
-                      <span className="text-lg">📦</span>
-                      Amazon Product
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
+                              
             {/* Product Features Grid - Professional */}
             {product.is_amazon_product && (
               <div className="mt-8 bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border border-slate-200 shadow-soft">
