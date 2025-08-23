@@ -295,7 +295,7 @@ export default function ProductDetails() {
                   autoPlay={true}
                   interval={5000}
                 />
-                              
+                   </div>           
             {/* Product Features Grid - Professional */}
             {product.is_amazon_product && (
               <div className="mt-8 bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border border-slate-200 shadow-soft">
