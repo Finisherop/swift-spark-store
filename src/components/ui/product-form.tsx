@@ -3,6 +3,7 @@ import { Button } from "./button";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Textarea } from "./textarea";
+import { Checkbox } from "./checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 import { Badge } from "./badge";
@@ -22,6 +23,11 @@ interface Product {
   affiliate_link: string;
   images: string[];
   is_active: boolean;
+  is_amazon_product?: boolean;
+  amazon_affiliate_link?: string;
+  amazon_image_url?: string;
+  short_description_amazon?: string;
+  long_description_amazon?: string;
 }
 
 interface ProductFormProps {
@@ -44,7 +50,12 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     badge: '',
     affiliate_link: '',
     images: [] as string[],
-    is_active: true
+    is_active: true,
+    is_amazon_product: false,
+    amazon_affiliate_link: '',
+    amazon_image_url: '',
+    short_description_amazon: '',
+    long_description_amazon: ''
   });
   const [loading, setLoading] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -61,7 +72,12 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
         badge: product.badge || '',
         affiliate_link: product.affiliate_link,
         images: product.images,
-        is_active: product.is_active
+        is_active: product.is_active,
+        is_amazon_product: product.is_amazon_product || false,
+        amazon_affiliate_link: product.amazon_affiliate_link || '',
+        amazon_image_url: product.amazon_image_url || '',
+        short_description_amazon: product.short_description_amazon || '',
+        long_description_amazon: product.long_description_amazon || ''
       });
     }
   }, [product]);
@@ -102,9 +118,10 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     setLoading(true);
 
     try {
-      const price = parseFloat(formData.price);
+      // For Amazon products, price is not required
+      const price = formData.is_amazon_product ? 0 : parseFloat(formData.price);
       const originalPrice = formData.original_price ? parseFloat(formData.original_price) : null;
-      const discountPercentage = calculateDiscountPercentage();
+      const discountPercentage = formData.is_amazon_product ? 0 : calculateDiscountPercentage();
 
       const productData = {
         name: formData.name,
@@ -116,8 +133,13 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
         category: formData.category,
         badge: formData.badge === 'none' ? null : formData.badge,
         affiliate_link: formData.affiliate_link,
-        images: formData.images,
-        is_active: formData.is_active
+        images: formData.is_amazon_product ? [formData.amazon_image_url] : formData.images,
+        is_active: formData.is_active,
+        is_amazon_product: formData.is_amazon_product,
+        amazon_affiliate_link: formData.is_amazon_product ? formData.amazon_affiliate_link : null,
+        amazon_image_url: formData.is_amazon_product ? formData.amazon_image_url : null,
+        short_description_amazon: formData.is_amazon_product ? formData.short_description_amazon : null,
+        long_description_amazon: formData.is_amazon_product ? formData.long_description_amazon : null
       };
 
       if (product) {
@@ -167,72 +189,122 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
+            {/* Amazon Product Checkbox */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="is_amazon_product"
+                checked={formData.is_amazon_product}
+                onCheckedChange={(checked) => handleInputChange('is_amazon_product', checked)}
+              />
+              <Label htmlFor="is_amazon_product">This is an Amazon Product</Label>
+            </div>
+
             {/* Basic Information */}
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor="name">Product Name *</Label>
+                <Label htmlFor="name">Product Name {!formData.is_amazon_product && '*'}</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Enter product name"
-                  required
+                  required={!formData.is_amazon_product}
                 />
               </div>
 
-              <div>
-                <Label htmlFor="short_description">Short Description *</Label>
-                <Input
-                  id="short_description"
-                  value={formData.short_description}
-                  onChange={(e) => handleInputChange('short_description', e.target.value)}
-                  placeholder="Brief product description (shown on cards)"
-                  required
-                />
-              </div>
+              {formData.is_amazon_product ? (
+                <>
+                  <div>
+                    <Label htmlFor="short_description_amazon">Short Description (150-200 characters)</Label>
+                    <Input
+                      id="short_description_amazon"
+                      value={formData.short_description_amazon}
+                      onChange={(e) => handleInputChange('short_description_amazon', e.target.value)}
+                      placeholder="Brief Amazon product description for listing"
+                      maxLength={200}
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="description">Full Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Detailed product description"
-                  rows={4}
-                />
-              </div>
+                  <div>
+                    <Label htmlFor="long_description_amazon">Long Description (500-1000 characters)</Label>
+                    <Textarea
+                      id="long_description_amazon"
+                      value={formData.long_description_amazon}
+                      onChange={(e) => handleInputChange('long_description_amazon', e.target.value)}
+                      placeholder="Detailed Amazon product description"
+                      rows={6}
+                      maxLength={1000}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <Label htmlFor="short_description">Short Description *</Label>
+                    <Input
+                      id="short_description"
+                      value={formData.short_description}
+                      onChange={(e) => handleInputChange('short_description', e.target.value)}
+                      placeholder="Brief product description (shown on cards)"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="description">Full Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      placeholder="Detailed product description"
+                      rows={4}
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Pricing */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="price">Current Price ($) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  placeholder="0.00"
-                  required
-                />
+            {formData.is_amazon_product ? (
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700 font-medium">
+                  Price will be shown on Amazon
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Amazon Associates compliance: Static prices cannot be displayed for Amazon products
+                </p>
               </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="price">Current Price ($) *</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="original_price">Original Price ($)</Label>
-                <Input
-                  id="original_price"
-                  type="number"
-                  step="0.01"
-                  value={formData.original_price}
-                  onChange={(e) => handleInputChange('original_price', e.target.value)}
-                  placeholder="0.00"
-                />
+                <div>
+                  <Label htmlFor="original_price">Original Price ($)</Label>
+                  <Input
+                    id="original_price"
+                    type="number"
+                    step="0.01"
+                    value={formData.original_price}
+                    onChange={(e) => handleInputChange('original_price', e.target.value)}
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Discount Badge */}
-            {calculateDiscountPercentage() > 0 && (
+            {!formData.is_amazon_product && calculateDiscountPercentage() > 0 && (
               <div className="p-3 bg-green-50 rounded-lg border">
                 <p className="text-sm text-green-700">
                   <strong>Discount:</strong> {calculateDiscountPercentage()}% off
@@ -278,57 +350,85 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
 
             {/* Affiliate Link */}
             <div>
-              <Label htmlFor="affiliate_link">Affiliate Link *</Label>
+              <Label htmlFor={formData.is_amazon_product ? "amazon_affiliate_link" : "affiliate_link"}>
+                {formData.is_amazon_product ? "Amazon Affiliate Link *" : "Affiliate Link *"}
+              </Label>
               <Input
-                id="affiliate_link"
+                id={formData.is_amazon_product ? "amazon_affiliate_link" : "affiliate_link"}
                 type="url"
-                value={formData.affiliate_link}
-                onChange={(e) => handleInputChange('affiliate_link', e.target.value)}
-                placeholder="https://example.com/product"
+                value={formData.is_amazon_product ? formData.amazon_affiliate_link : formData.affiliate_link}
+                onChange={(e) => handleInputChange(
+                  formData.is_amazon_product ? 'amazon_affiliate_link' : 'affiliate_link', 
+                  e.target.value
+                )}
+                placeholder={formData.is_amazon_product ? "https://amazon.com/dp/..." : "https://example.com/product"}
                 required
               />
             </div>
 
             {/* Images */}
             <div>
-              <Label>Product Images</Label>
-              <div className="space-y-3">
-                <div className="flex gap-2">
+              <Label>{formData.is_amazon_product ? "Amazon API Image URL *" : "Product Images"}</Label>
+              {formData.is_amazon_product ? (
+                <div className="space-y-3">
                   <Input
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    placeholder="Enter image URL"
-                    className="flex-1"
+                    value={formData.amazon_image_url}
+                    onChange={(e) => handleInputChange('amazon_image_url', e.target.value)}
+                    placeholder="Enter Amazon API image URL"
+                    required
                   />
-                  <Button type="button" onClick={addImage} disabled={!newImageUrl.trim()}>
-                    <Upload className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Use only Amazon API provided image URLs for compliance
+                  </p>
+                  {formData.amazon_image_url && (
+                    <div className="mt-2">
+                      <img
+                        src={formData.amazon_image_url}
+                        alt="Amazon Product"
+                        className="w-full h-24 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
                 </div>
-
-                {formData.images.length > 0 && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={image}
-                          alt={`Product ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => removeImage(index)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      value={newImageUrl}
+                      onChange={(e) => setNewImageUrl(e.target.value)}
+                      placeholder="Enter image URL"
+                      className="flex-1"
+                    />
+                    <Button type="button" onClick={addImage} disabled={!newImageUrl.trim()}>
+                      <Upload className="h-4 w-4 mr-1" />
+                      Add
+                    </Button>
                   </div>
-                )}
-              </div>
+
+                  {formData.images.length > 0 && (
+                    <div className="grid grid-cols-2 gap-3">
+                      {formData.images.map((image, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={image}
+                            alt={`Product ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeImage(index)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Active Status */}

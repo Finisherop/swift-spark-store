@@ -23,6 +23,11 @@ interface Product {
   badge?: string;
   affiliate_link: string;
   images: string[];
+  is_amazon_product?: boolean;
+  amazon_affiliate_link?: string;
+  amazon_image_url?: string;
+  short_description_amazon?: string;
+  long_description_amazon?: string;
 }
 
 export default function ProductDetails() {
@@ -102,7 +107,8 @@ export default function ProductDetails() {
     if (!product) return;
 
     await trackClick('buy_now');
-    window.open(product.affiliate_link, '_blank');
+    const linkToOpen = product.is_amazon_product ? product.amazon_affiliate_link : product.affiliate_link;
+    window.open(linkToOpen, '_blank');
   };
 
   const handleViewDetails = (product: Product) => {
@@ -287,36 +293,47 @@ export default function ProductDetails() {
           <div className="space-y-8 animate-slide-up order-2 lg:order-2">
             {/* Title - Prominently Highlighted */}
             <div className="bg-gradient-to-r from-primary-light/20 to-transparent p-6 rounded-2xl border-l-4 border-l-primary">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight mb-4 text-foreground bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-                {product.name}
-              </h1>
+              {product.name && (
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight mb-4 text-foreground bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                  {product.name}
+                </h1>
+              )}
               <div className="bg-accent/30 p-4 rounded-xl">
                 <p className="text-base lg:text-lg font-semibold text-accent-foreground leading-relaxed">
-                  {product.short_description}
+                  {product.is_amazon_product ? product.short_description_amazon : product.short_description}
                 </p>
               </div>
             </div>
 
             {/* Price Section - Bold and Prominent */}
-            <div className="bg-gradient-to-br from-success/10 to-success/5 p-6 rounded-2xl border border-success/20 shadow-soft">
-              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl font-bold text-primary">
-                      ${Math.round(product.price)}
-                    </span>
-                    {product.original_price && product.original_price > product.price && (
-                      <span className="text-xl text-muted-foreground line-through">
-                        ${Math.round(product.original_price)}
+            {!product.is_amazon_product ? (
+              <div className="bg-gradient-to-br from-success/10 to-success/5 p-6 rounded-2xl border border-success/20 shadow-soft">
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-4xl font-bold text-primary">
+                        ${Math.round(product.price)}
                       </span>
-                    )}
-                  </div>
-                {product.discount_percentage > 0 && (
-                  <Badge variant="destructive" className="text-sm font-bold px-3 py-1 shadow-soft">
-                    Save {product.discount_percentage}%
-                  </Badge>
-                )}
+                      {product.original_price && product.original_price > product.price && (
+                        <span className="text-xl text-muted-foreground line-through">
+                          ${Math.round(product.original_price)}
+                        </span>
+                      )}
+                    </div>
+                  {product.discount_percentage > 0 && (
+                    <Badge variant="destructive" className="text-sm font-bold px-3 py-1 shadow-soft">
+                      Save {product.discount_percentage}%
+                    </Badge>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-gradient-to-br from-blue/10 to-blue/5 p-6 rounded-2xl border border-blue/20 shadow-soft">
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-blue-700 mb-2">Price Available on Amazon</p>
+                  <p className="text-sm text-blue-600">Check current pricing and availability directly on Amazon</p>
+                </div>
+              </div>
+            )}
 
             {/* Badges and Share */}
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -356,22 +373,45 @@ export default function ProductDetails() {
 
             {/* Features */}
             <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-xl">
-              <div className="flex items-center space-x-2 text-sm font-medium">
-                <Shield className="h-5 w-5 text-primary" />
-                <span>Quality Assured</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm font-medium">
-                <Truck className="h-5 w-5 text-primary" />
-                <span>Fast Delivery</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm font-medium">
-                <RefreshCw className="h-5 w-5 text-primary" />
-                <span>Easy Returns</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm font-medium">
-                <Star className="h-5 w-5 text-primary" />
-                <span>Trusted Brand</span>
-              </div>
+              {product.is_amazon_product ? (
+                <>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <Star className="h-5 w-5 text-primary" />
+                    <span>Popular choice</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <Shield className="h-5 w-5 text-primary" />
+                    <span>Customer favorite</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <RefreshCw className="h-5 w-5 text-primary" />
+                    <span>Check return policy on Amazon</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <Truck className="h-5 w-5 text-primary" />
+                    <span>Amazon delivery</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <Shield className="h-5 w-5 text-primary" />
+                    <span>Quality Assured</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <Truck className="h-5 w-5 text-primary" />
+                    <span>Fast Delivery</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <RefreshCw className="h-5 w-5 text-primary" />
+                    <span>Easy Returns</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm font-medium">
+                    <Star className="h-5 w-5 text-primary" />
+                    <span>Trusted Brand</span>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Buy Now Button */}
@@ -382,9 +422,21 @@ export default function ProductDetails() {
                 className="w-full text-lg font-bold py-6 shadow-strong hover:shadow-glow transition-all duration-300 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary"
               >
                 <ExternalLink className="mr-2 h-5 w-5" />
-                Buy Now - ${Math.round(product.price)}
+                {product.is_amazon_product ? "Check Latest Price on Amazon" : `Buy Now - $${Math.round(product.price)}`}
               </Button>
             </div>
+
+            {/* Amazon Disclaimers */}
+            {product.is_amazon_product && (
+              <div className="space-y-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
+                <p className="text-yellow-800 font-medium">
+                  📢 This page promotes Amazon products. Please check the latest price and availability directly on Amazon.
+                </p>
+                <p className="text-yellow-700">
+                  💰 <strong>Affiliate Disclosure:</strong> As an Amazon Associate, I earn from qualifying purchases.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -397,17 +449,32 @@ export default function ProductDetails() {
               </h2>
               <div className="prose prose-lg max-w-none">
                 <div className="bg-muted/20 rounded-xl p-6 border-l-4 border-l-accent">
-                  {product.description ? (
-                    <div 
-                      className="text-foreground leading-relaxed text-base lg:text-lg font-medium"
-                      dangerouslySetInnerHTML={{ 
-                        __html: product.description.replace(/\n/g, '<br/>') 
-                      }}
-                    />
+                  {product.is_amazon_product ? (
+                    product.long_description_amazon ? (
+                      <div 
+                        className="text-foreground leading-relaxed text-base lg:text-lg font-medium"
+                        dangerouslySetInnerHTML={{ 
+                          __html: product.long_description_amazon.replace(/\n/g, '<br/>') 
+                        }}
+                      />
+                    ) : (
+                      <p className="text-foreground leading-relaxed text-base lg:text-lg font-medium">
+                        {product.short_description_amazon}
+                      </p>
+                    )
                   ) : (
-                    <p className="text-foreground leading-relaxed text-base lg:text-lg font-medium">
-                      {product.short_description}
-                    </p>
+                    product.description ? (
+                      <div 
+                        className="text-foreground leading-relaxed text-base lg:text-lg font-medium"
+                        dangerouslySetInnerHTML={{ 
+                          __html: product.description.replace(/\n/g, '<br/>') 
+                        }}
+                      />
+                    ) : (
+                      <p className="text-foreground leading-relaxed text-base lg:text-lg font-medium">
+                        {product.short_description}
+                      </p>
+                    )
                   )}
                 </div>
               </div>

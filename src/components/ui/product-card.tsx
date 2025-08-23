@@ -17,6 +17,11 @@ interface Product {
   badge?: string;
   affiliate_link: string;
   images: string[];
+  is_amazon_product?: boolean;
+  amazon_affiliate_link?: string;
+  amazon_image_url?: string;
+  short_description_amazon?: string;
+  long_description_amazon?: string;
 }
 
 interface ProductCardProps {
@@ -122,7 +127,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         )}
 
         {/* Discount Badge */}
-        {product.discount_percentage > 0 && (
+        {!product.is_amazon_product && product.discount_percentage > 0 && (
           <Badge 
             variant="destructive"
             className="absolute top-3 right-3 animate-bounce-in"
@@ -187,20 +192,28 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
 
         {/* Description */}
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {product.short_description}
+          {product.is_amazon_product ? product.short_description_amazon : product.short_description}
         </p>
 
         {/* Price Section */}
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-primary">
-            ${Math.round(product.price).toLocaleString()}
-          </span>
-          {product.original_price && product.original_price > product.price && (
-            <span className="text-sm text-muted-foreground line-through">
-              ${Math.round(product.original_price).toLocaleString()}
+        {!product.is_amazon_product ? (
+          <div className="flex items-center space-x-2">
+            <span className="text-2xl font-bold text-primary">
+              ${Math.round(product.price).toLocaleString()}
             </span>
-          )}
-        </div>
+            {product.original_price && product.original_price > product.price && (
+              <span className="text-sm text-muted-foreground line-through">
+                ${Math.round(product.original_price).toLocaleString()}
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-sm font-medium text-blue-700">
+              Price available on Amazon
+            </p>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-2 pt-2">
@@ -219,7 +232,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
             className="flex-1 transition-smooth hover:shadow-medium"
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
-            Buy Now
+            {product.is_amazon_product ? "View on Amazon" : "Buy Now"}
           </Button>
           <Button
             variant="ghost"

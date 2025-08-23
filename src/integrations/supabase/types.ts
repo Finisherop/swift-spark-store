@@ -52,6 +52,8 @@ export type Database = {
       products: {
         Row: {
           affiliate_link: string
+          amazon_affiliate_link: string | null
+          amazon_image_url: string | null
           badge: string | null
           category: string
           created_at: string
@@ -60,14 +62,19 @@ export type Database = {
           id: string
           images: string[] | null
           is_active: boolean | null
+          is_amazon_product: boolean | null
+          long_description_amazon: string | null
           name: string
           original_price: number | null
           price: number
           short_description: string | null
+          short_description_amazon: string | null
           updated_at: string
         }
         Insert: {
           affiliate_link: string
+          amazon_affiliate_link?: string | null
+          amazon_image_url?: string | null
           badge?: string | null
           category: string
           created_at?: string
@@ -76,14 +83,19 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_active?: boolean | null
+          is_amazon_product?: boolean | null
+          long_description_amazon?: string | null
           name: string
           original_price?: number | null
           price: number
           short_description?: string | null
+          short_description_amazon?: string | null
           updated_at?: string
         }
         Update: {
           affiliate_link?: string
+          amazon_affiliate_link?: string | null
+          amazon_image_url?: string | null
           badge?: string | null
           category?: string
           created_at?: string
@@ -92,10 +104,13 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_active?: boolean | null
+          is_amazon_product?: boolean | null
+          long_description_amazon?: string | null
           name?: string
           original_price?: number | null
           price?: number
           short_description?: string | null
+          short_description_amazon?: string | null
           updated_at?: string
         }
         Relationships: []
