@@ -133,7 +133,9 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
         category: formData.category,
         badge: formData.badge === 'none' ? null : formData.badge,
         affiliate_link: formData.affiliate_link,
-        images: formData.is_amazon_product ? [formData.amazon_image_url] : formData.images,
+        images: formData.is_amazon_product 
+          ? [formData.amazon_image_url, ...formData.images].filter(Boolean)
+          : formData.images,
         is_active: formData.is_active,
         is_amazon_product: formData.is_amazon_product,
         amazon_affiliate_link: formData.is_amazon_product ? formData.amazon_affiliate_link : null,
@@ -368,9 +370,10 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
 
             {/* Images */}
             <div>
-              <Label>{formData.is_amazon_product ? "Amazon API Image URL *" : "Product Images"}</Label>
-              {formData.is_amazon_product ? (
-                <div className="space-y-3">
+              <Label>Product Images {formData.is_amazon_product ? "(Amazon + Additional)" : ""}</Label>
+              {formData.is_amazon_product && (
+                <div className="space-y-3 mb-4">
+                  <Label className="text-sm">Amazon API Image URL *</Label>
                   <Input
                     value={formData.amazon_image_url}
                     onChange={(e) => handleInputChange('amazon_image_url', e.target.value)}
@@ -390,45 +393,46 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
                     </div>
                   )}
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <Input
-                      value={newImageUrl}
-                      onChange={(e) => setNewImageUrl(e.target.value)}
-                      placeholder="Enter image URL"
-                      className="flex-1"
-                    />
-                    <Button type="button" onClick={addImage} disabled={!newImageUrl.trim()}>
-                      <Upload className="h-4 w-4 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-
-                  {formData.images.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {formData.images.map((image, index) => (
-                        <div key={index} className="relative group">
-                          <img
-                            src={image}
-                            alt={`Product ${index + 1}`}
-                            className="w-full h-24 object-cover rounded-lg border"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => removeImage(index)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               )}
+              
+              <div className="space-y-3">
+                <Label className="text-sm">{formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    placeholder="Enter image URL"
+                    className="flex-1"
+                  />
+                  <Button type="button" onClick={addImage} disabled={!newImageUrl.trim()}>
+                    <Upload className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </div>
+
+                {formData.images.length > 0 && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={image}
+                          alt={`Product ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeImage(index)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Active Status */}

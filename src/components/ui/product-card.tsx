@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Card, CardContent } from "./card";
 import { Button } from "./button";
 import { Badge } from "./badge";
+import { ImageCarousel } from "./image-carousel";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -31,21 +33,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
-  
-
-  // Auto-swipe images every 3 seconds
-  useEffect(() => {
-    if (product.images.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }
-  }, [product.images.length]);
 
   const getBadgeVariant = (badge: string) => {
     switch (badge?.toLowerCase()) {
@@ -110,17 +99,28 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
     <div className="product-card group">
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden rounded-t-xl">
-        <img
-          src={product.images[currentImageIndex] || product.images[0]}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+        {product.images && product.images.length > 1 ? (
+          <div className="h-full">
+            <ImageCarousel 
+              images={product.images} 
+              alt={product.name}
+              autoPlay={true}
+              interval={4000}
+            />
+          </div>
+        ) : (
+          <img
+            src={product.images?.[0] || '/placeholder.svg'}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        )}
         
         {/* Badge */}
         {product.badge && (
           <Badge 
             variant={getBadgeVariant(product.badge)}
-            className="absolute top-3 left-3 animate-bounce-in"
+            className="absolute top-3 left-3 animate-bounce-in z-10"
           >
             {product.badge}
           </Badge>
@@ -130,31 +130,14 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         {!product.is_amazon_product && product.discount_percentage > 0 && (
           <Badge 
             variant="destructive"
-            className="absolute top-3 right-3 animate-bounce-in"
+            className="absolute top-3 right-3 animate-bounce-in z-10"
           >
             -{product.discount_percentage}%
           </Badge>
         )}
 
-        {/* Image Indicators */}
-        {product.images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1">
-            {product.images.map((_, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "w-2 h-2 rounded-full transition-all duration-300",
-                  index === currentImageIndex 
-                    ? "bg-white shadow-glow" 
-                    : "bg-white/60"
-                )}
-              />
-            ))}
-          </div>
-        )}
-
         {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-2">
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-2 z-10">
           <Button
             size="sm"
             variant="secondary"

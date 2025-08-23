@@ -66,13 +66,19 @@ export default function ProductDetails() {
       setProduct(productData);
 
       // Fetch similar products from the same category
-      const { data: similarData, error: similarError } = await supabase
+      let query = supabase
         .from('products')
         .select('*')
         .eq('category', productData.category)
         .neq('id', productId)
-        .eq('is_active', true)
-        .limit(4);
+        .eq('is_active', true);
+
+      // If current product is Amazon product, show only Amazon products as similar
+      if (productData.is_amazon_product) {
+        query = query.eq('is_amazon_product', true);
+      }
+
+      const { data: similarData, error: similarError } = await query.limit(4);
 
       if (!similarError && similarData) {
         setSimilarProducts(similarData);
