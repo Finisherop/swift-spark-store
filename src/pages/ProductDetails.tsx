@@ -291,7 +291,7 @@ export default function ProductDetails() {
           <div className="max-w-7xl mx-auto">
             {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-              {/* Left: Product Image */}
+              {/* Left: Product Image with Auto Swipe Animation */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -305,11 +305,37 @@ export default function ProductDetails() {
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-contain rounded-2xl"
-                      />
+                      {product.images && product.images.length > 1 ? (
+                        <motion.div
+                          className="w-full h-full"
+                          animate={{ 
+                            x: [0, -100, -200, -300, 0] 
+                          }}
+                          transition={{
+                            duration: 8,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        >
+                          <div className="flex w-[400%] h-full">
+                            {product.images.slice(0, 4).map((image, index) => (
+                              <div key={index} className="w-1/4 h-full flex-shrink-0">
+                                <img
+                                  src={image}
+                                  alt={`${product.name} - Image ${index + 1}`}
+                                  className="w-full h-full object-contain rounded-2xl"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-full h-full object-contain rounded-2xl"
+                        />
+                      )}
                     </motion.div>
                   </div>
                 </div>
@@ -365,10 +391,11 @@ export default function ProductDetails() {
                   <h3 className="text-xl font-semibold text-foreground">Key Features:</h3>
                   <div className="space-y-3">
                     {[
-                      "Premium Quality Materials",
-                      "Fast & Free Shipping",
-                      "Excellent Customer Reviews",
-                      "Money Back Guarantee"
+                      "🚀 Free & Fast Delivery via Amazon",
+                      "⭐ Premium build & trusted brand",
+                      "🔋 Long-lasting performance", 
+                      "🎁 Great value for money",
+                      "🔒 Secure purchase with Amazon checkout"
                     ].map((feature, index) => (
                       <motion.div
                         key={index}
@@ -377,7 +404,7 @@ export default function ProductDetails() {
                         transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                         className="flex items-center gap-3"
                       >
-                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                           <Check className="h-4 w-4 text-white" />
                         </div>
                         <span className="text-foreground font-medium">{feature}</span>
