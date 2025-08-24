@@ -451,9 +451,9 @@ export default function ProductDetails() {
                   transition={{ duration: 0.6, delay: 1.4 }}
                 >
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    🛍️
+                  🛍️
                   </div>
-                  More Amazon Products
+                  Your Search Related Products
                 </motion.h2>
                 <motion.p 
                   className="text-indigo-100 mt-2"
@@ -461,7 +461,7 @@ export default function ProductDetails() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 1.5 }}
                 >
-                  Discover more quality products available on Amazon
+                  Discover products related to your search
                 </motion.p>
               </div>
               
@@ -531,10 +531,21 @@ export default function ProductDetails() {
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-foreground mb-4">Contact Info</h3>
-              <p className="text-muted-foreground text-sm">
-                Email: support@example.com
-              </p>
+              <h3 className="font-semibold text-foreground mb-4">Follow Us</h3>
+              <div className="space-y-2">
+                <a href="https://pinterest.com/yourstore" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.373 0 0 5.372 0 12s5.373 12 12 12c6.628 0 12-5.372 12-12S18.628 0 12 0zm0 19c-.721 0-1.418-.109-2.073-.312.286-.465.713-1.227.713-1.227s.179.339.889.339c2.966 0 4.96-2.686 4.96-6.275 0-2.715-1.522-5.297-4.438-5.297-3.331 0-5.052 2.389-5.052 4.383 0 1.205.456 2.27 1.438 2.67.161.067.307.003.353-.18.033-.13.111-.437.145-.568.047-.181.029-.245-.1-.404-.284-.349-.465-.8-.465-1.442 0-1.855 1.389-3.517 3.617-3.517 1.972 0 3.055 1.205 3.055 2.812 0 2.115-936 3.821-2.131 3.821-.701 0-1.225-.578-.1.057.941.636 1.577 1.602 1.577 2.714 0 .309-.026.602-.078.884C16.605 18.658 19 15.634 19 12c0-3.859-3.141-7-7-7s-7 3.141-7 7 3.141 7 7 7z"/>
+                  </svg>
+                  Pinterest
+                </a>
+                <a href="https://instagram.com/yourstore" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                  Instagram
+                </a>
+              </div>
             </div>
           </div>
           
