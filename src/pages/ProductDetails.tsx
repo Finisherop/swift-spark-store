@@ -322,43 +322,33 @@ export default function ProductDetails() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="space-y-8"
               >
-                {/* Title */}
-                <div>
+                  {/* Title */}
                   <motion.h1 
-                    className="text-4xl lg:text-5xl font-bold text-foreground leading-tight mb-4"
+                    className="text-4xl lg:text-5xl font-bold text-foreground leading-tight mb-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
                   >
                     {product.name}
                   </motion.h1>
-                  
-                  {/* Price */}
-                  <motion.div 
-                    className="text-3xl font-bold text-primary mb-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                  >
-                    ${Math.round(product.price)}
-                  </motion.div>
-                </div>
 
-                {/* Short Description */}
-                <motion.p 
-                  className="text-lg text-muted-foreground leading-relaxed"
+                {/* Short Description - Stylish */}
+                <motion.div 
+                  className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl p-6 border border-primary/10"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  {product.short_description || product.description}
-                </motion.p>
+                  <p className="text-lg text-foreground leading-relaxed font-medium text-center">
+                    {product.short_description || product.description}
+                  </p>
+                </motion.div>
 
                 {/* Top Pick Badge */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-full font-semibold text-lg shadow-lg"
                 >
                   <Flame className="h-5 w-5" />
@@ -369,7 +359,7 @@ export default function ProductDetails() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.7 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
                   className="space-y-4"
                 >
                   <h3 className="text-xl font-semibold text-foreground">Key Features:</h3>
@@ -384,7 +374,7 @@ export default function ProductDetails() {
                         key={index}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+                        transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                         className="flex items-center gap-3"
                       >
                         <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
@@ -400,7 +390,7 @@ export default function ProductDetails() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.2 }}
+                  transition={{ duration: 0.6, delay: 1.0 }}
                   className="space-y-4"
                 >
                   {/* Primary Buy Button */}
@@ -413,7 +403,7 @@ export default function ProductDetails() {
                       onClick={handleBuyNow}
                       className="w-full text-xl font-bold py-6 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 rounded-2xl group"
                     >
-                      Buy Now - ${Math.round(product.price)}
+                      Buy Now on Amazon
                       <ExternalLink className="ml-3 h-6 w-6 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </motion.div>
@@ -436,30 +426,6 @@ export default function ProductDetails() {
                 </motion.div>
               </motion.div>
             </div>
-
-            {/* Affiliate Disclosure */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.4 }}
-              className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 rounded-2xl p-6 border border-amber-200 dark:border-amber-800 mb-16"
-            >
-              <div className="flex items-start gap-3">
-                <div className="text-amber-600 dark:text-amber-400 mt-1">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">
-                    Affiliate Disclosure
-                  </h3>
-                  <p className="text-sm text-amber-700 dark:text-amber-300">
-                    As an Amazon Associate I earn from qualifying purchases. This comes at no additional cost to you.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
           </div>
         ) : (
           /* Regular Product Layout - keeping existing layout for non-Amazon products */
@@ -473,7 +439,7 @@ export default function ProductDetails() {
           <motion.section
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.6 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
             className="mb-16"
           >
             <div className="bg-white dark:bg-card rounded-3xl shadow-2xl border border-border/10 overflow-hidden">
@@ -482,7 +448,7 @@ export default function ProductDetails() {
                   className="text-3xl font-bold flex items-center gap-3"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 1.8 }}
+                  transition={{ duration: 0.6, delay: 1.4 }}
                 >
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                     🛍️
@@ -493,7 +459,7 @@ export default function ProductDetails() {
                   className="text-indigo-100 mt-2"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 1.9 }}
+                  transition={{ duration: 0.6, delay: 1.5 }}
                 >
                   Discover more quality products available on Amazon
                 </motion.p>
@@ -506,7 +472,7 @@ export default function ProductDetails() {
                       key={product.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 2 + index * 0.1 }}
+                      transition={{ duration: 0.5, delay: 1.6 + index * 0.1 }}
                       whileHover={{ y: -8, scale: 1.02 }}
                       className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/20 overflow-hidden hover:shadow-2xl transition-all duration-300"
                     >
