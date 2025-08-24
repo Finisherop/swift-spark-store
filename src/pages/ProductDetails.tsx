@@ -28,6 +28,7 @@ interface Product {
   amazon_image_url?: string;
   short_description_amazon?: string;
   long_description_amazon?: string;
+  amazon_url?: string;
 }
 
 export default function ProductDetails() {
@@ -65,17 +66,17 @@ export default function ProductDetails() {
 
       setProduct(productData);
 
-      // Fetch similar products from the same category
+      // Fetch similar products - only Amazon products if current is Amazon
       let query = supabase
         .from('products')
         .select('*')
-        .eq('category', productData.category)
         .neq('id', productId)
         .eq('is_active', true);
 
-      // If current product is Amazon product, show only Amazon products as similar
       if (productData.is_amazon_product) {
         query = query.eq('is_amazon_product', true);
+      } else {
+        query = query.eq('category', productData.category);
       }
 
       const { data: similarData, error: similarError } = await query.limit(4);
@@ -101,7 +102,7 @@ export default function ProductDetails() {
         .insert({
           product_id: product.id,
           click_type: clickType,
-          user_ip: 'unknown', // Would be populated by backend in real scenario
+          user_ip: 'unknown',
           user_agent: navigator.userAgent
         });
     } catch (error) {
@@ -113,7 +114,7 @@ export default function ProductDetails() {
     if (!product) return;
 
     await trackClick('buy_now');
-    const linkToOpen = product.is_amazon_product ? product.amazon_affiliate_link : product.affiliate_link;
+    const linkToOpen = product.is_amazon_product ? (product.amazon_affiliate_link || product.amazon_url) : product.affiliate_link;
     window.open(linkToOpen, '_blank');
   };
 
@@ -123,11 +124,8 @@ export default function ProductDetails() {
 
   const handleBuyNowGrid = async (product: Product) => {
     await trackClick('buy_now');
-    if (product.category === 'Fashion') {
-      window.open(product.affiliate_link, '_blank');
-    } else {
-      window.open(product.affiliate_link, '_blank');
-    }
+    const linkToOpen = product.is_amazon_product ? (product.amazon_affiliate_link || product.amazon_url) : product.affiliate_link;
+    window.open(linkToOpen, '_blank');
   };
 
   const getBadgeVariant = (badge: string) => {
@@ -283,111 +281,115 @@ export default function ProductDetails() {
           Back to Products
         </Button>
 
-        {/* Product Details Section - Enhanced Professional Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-16">
-          {/* Left: Image Carousel - Professional Presentation */}
-          <div className="xl:col-span-2 animate-fade-in">
-            <div className="bg-white rounded-3xl shadow-luxury border border-muted/20 overflow-hidden">
-              <div className="aspect-square lg:aspect-[4/3] relative">
-                <ImageCarousel 
-                  images={product.images} 
-                  alt={product.name}
-                  autoPlay={true}
-                  interval={5000}
-                />
-                   </div>           
-            {/* Product Features Grid - Professional */}
-            {product.is_amazon_product && (
-              <div className="mt-8 bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border border-slate-200 shadow-soft">
-                <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                  <Star className="h-6 w-6 text-amber-500" />
-                  Why Choose This Product
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Shield className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-800 mb-1">Amazon Verified</h4>
-                      <p className="text-sm text-slate-600">Authentic products with Amazon's guarantee</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <Truck className="h-6 w-6 text-green-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-800 mb-1">Fast Delivery</h4>
-                      <p className="text-sm text-slate-600">Prime eligible with quick shipping</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <Star className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-800 mb-1">Top Rated</h4>
-                      <p className="text-sm text-slate-600">Highly rated by customers</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
-                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                      <RefreshCw className="h-6 w-6 text-indigo-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-800 mb-1">Easy Returns</h4>
-                      <p className="text-sm text-slate-600">Hassle-free return policy</p>
-                    </div>
-                  </div>
+        {/* Amazon Product - Blog Style Layout */}
+        {product.is_amazon_product ? (
+          <div className="max-w-4xl mx-auto space-y-12 animate-fade-in">
+            {/* Hero Image Section */}
+            <div className="text-center">
+              <div className="relative bg-white rounded-3xl shadow-luxury border border-muted/20 overflow-hidden max-w-2xl mx-auto">
+                <div className="aspect-square">
+                  <ImageCarousel 
+                    images={product.images} 
+                    alt={product.name}
+                    autoPlay={true}
+                    interval={5000}
+                  />
                 </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Right: Product Info - Professional Sidebar */}
-          <div className="xl:col-span-1 space-y-6 animate-slide-up">
-            {/* Professional Product Card */}
-            <div className="bg-white rounded-3xl shadow-luxury border border-muted/20 p-8 sticky top-6">
-              {/* Title & Category */}
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge variant="outline" className="text-xs px-2 py-1 bg-primary/10 text-primary border-primary/20">
-                    {product.category}
-                  </Badge>
-                  {product.badge && (
-                    <Badge variant={getBadgeVariant(product.badge)} className="text-xs px-2 py-1">
-                      {product.badge}
-                    </Badge>
-                  )}
+            {/* Blog Title */}
+            <div className="text-center animate-scale-in">
+              <h1 className="text-4xl md:text-6xl font-bold text-gradient bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-6 leading-tight">
+                {product.name}
+              </h1>
+              <div className="w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto rounded-full mb-8"></div>
+            </div>
+
+            {/* Blog Content */}
+            <article className="prose prose-xl max-w-none animate-fade-in delay-200">
+              <div className="bg-gradient-to-br from-background to-muted/30 rounded-3xl p-8 md:p-12 shadow-elegant border border-border/50">
+                <div className="text-lg md:text-xl leading-relaxed text-foreground/80 text-center whitespace-pre-line">
+                  {product.long_description_amazon || product.description || product.short_description_amazon}
                 </div>
-                
-                {product.name && (
+              </div>
+            </article>
+
+            {/* Disclosure Section */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 rounded-2xl p-6 border border-amber-200 dark:border-amber-800 animate-fade-in delay-300">
+              <div className="flex items-start gap-3">
+                <div className="text-amber-600 dark:text-amber-400 mt-1">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">
+                    Affiliate Disclosure
+                  </h3>
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    This post contains affiliate links. When you purchase through these links, we may earn a commission at no additional cost to you.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="text-center animate-scale-in delay-400">
+              <Button
+                size="lg"
+                onClick={handleBuyNow}
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-glow group"
+              >
+                <span>Buy Now on Amazon</span>
+                <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* Regular Product Layout */
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-16">
+            {/* Left: Image Carousel */}
+            <div className="xl:col-span-2 animate-fade-in">
+              <div className="bg-white rounded-3xl shadow-luxury border border-muted/20 overflow-hidden">
+                <div className="aspect-square lg:aspect-[4/3] relative">
+                  <ImageCarousel 
+                    images={product.images} 
+                    alt={product.name}
+                    autoPlay={true}
+                    interval={5000}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Product Info */}
+            <div className="xl:col-span-1 space-y-6 animate-slide-up">
+              <div className="bg-white rounded-3xl shadow-luxury border border-muted/20 p-8 sticky top-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge variant="outline" className="text-xs px-2 py-1 bg-primary/10 text-primary border-primary/20">
+                      {product.category}
+                    </Badge>
+                    {product.badge && (
+                      <Badge variant={getBadgeVariant(product.badge)} className="text-xs px-2 py-1">
+                        {product.badge}
+                      </Badge>
+                    )}
+                  </div>
+                  
                   <h1 className="text-2xl lg:text-3xl font-black leading-tight text-slate-800 mb-4">
                     {product.name}
                   </h1>
-                )}
-                
-                <p className="text-slate-600 leading-relaxed">
-                  {product.is_amazon_product ? product.short_description_amazon : product.short_description}
-                </p>
-              </div>
-
-              {/* Professional Rating Display */}
-              {product.is_amazon_product && (
-                <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="h-5 w-5 text-amber-400 fill-current" />
-                    ))}
-                    <span className="text-sm font-semibold text-slate-700 ml-2">Highly Rated on Amazon</span>
-                  </div>
-                  <p className="text-xs text-amber-700">Check current reviews and ratings on Amazon</p>
+                  
+                  <p className="text-slate-600 leading-relaxed">
+                    {product.short_description}
+                  </p>
                 </div>
-              )}
 
-              {/* Price Section - Enhanced */}
-              {!product.is_amazon_product ? (
+                {/* Price Section */}
                 <div className="mb-6 p-6 bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border border-emerald-200">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-3xl font-bold text-emerald-700">
@@ -408,195 +410,60 @@ export default function ProductDetails() {
                   </div>
                   <p className="text-sm text-emerald-600 font-medium">✓ Best Price Guaranteed</p>
                 </div>
-              ) : (
-                <div className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-700 mb-2">💰 Check Price on Amazon</div>
-                    <p className="text-sm text-blue-600 mb-3">Live pricing with current deals & discounts</p>
-                    <div className="flex items-center justify-center gap-2 text-xs text-blue-500">
-                      <RefreshCw className="h-3 w-3" />
-                      <span>Updated in real-time</span>
-                    </div>
+
+                <Button
+                  size="lg"
+                  onClick={handleBuyNow}
+                  className="w-full text-lg font-bold py-4 mb-6 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-luxury hover:shadow-glow transition-all duration-300 rounded-2xl"
+                >
+                  <ExternalLink className="mr-3 h-5 w-5" />
+                  Buy Now - ${Math.round(product.price)}
+                </Button>
+
+                {/* Trust Signals */}
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <Shield className="h-5 w-5 text-green-600" />
+                    <span className="text-slate-700 font-medium">Secure Checkout</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <Truck className="h-5 w-5 text-blue-600" />
+                    <span className="text-slate-700 font-medium">Fast & Free Shipping</span>
                   </div>
                 </div>
-              )}
 
-              {/* Professional CTA Button */}
-              <Button
-                size="lg"
-                onClick={handleBuyNow}
-                className="w-full text-lg font-bold py-4 mb-6 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-luxury hover:shadow-glow transition-all duration-300 rounded-2xl"
-              >
-                <ExternalLink className="mr-3 h-5 w-5" />
-                {product.is_amazon_product ? "View on Amazon →" : `Buy Now - $${Math.round(product.price)}`}
-              </Button>
-
-              {/* Trust Signals */}
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                  <Shield className="h-5 w-5 text-green-600" />
-                  <span className="text-slate-700 font-medium">
-                    {product.is_amazon_product ? "Amazon A-to-Z Guarantee" : "Secure Checkout"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                  <Truck className="h-5 w-5 text-blue-600" />
-                  <span className="text-slate-700 font-medium">
-                    {product.is_amazon_product ? "Prime Eligible Delivery" : "Fast & Free Shipping"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Share Options */}
-              <div className="mt-6 pt-6 border-t border-slate-200">
-                <p className="text-sm font-semibold text-slate-700 mb-3">Share this product</p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShareProduct}
-                    className="flex-1 text-xs"
-                  >
-                    <Share className="h-4 w-4 mr-2" />
-                    Share
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCopyLink}
-                    className="flex-1 text-xs"
-                  >
-                    {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
-                    {copied ? 'Copied!' : 'Copy'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Amazon Compliance Notice - Professional */}
-            {product.is_amazon_product && (
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-2xl p-6 shadow-soft">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <ExternalLink className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div className="space-y-3 text-sm">
-                    <div>
-                      <h4 className="font-bold text-amber-800 mb-1">📢 Amazon Product Notice</h4>
-                      <p className="text-amber-700 leading-relaxed">
-                        This page promotes Amazon products. Please verify current pricing and availability on Amazon.
-                      </p>
-                    </div>
-                    <div className="pt-2 border-t border-amber-200">
-                      <p className="text-amber-700 font-medium">
-                        💰 <strong>Affiliate Disclosure:</strong> As an Amazon Associate, we earn from qualifying purchases.
-                      </p>
-                    </div>
+                {/* Share Options */}
+                <div className="mt-6 pt-6 border-t border-slate-200">
+                  <p className="text-sm font-semibold text-slate-700 mb-3">Share this product</p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleShareProduct}
+                      className="flex-1 text-xs"
+                    >
+                      <Share className="h-4 w-4 mr-2" />
+                      Share
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyLink}
+                      className="flex-1 text-xs"
+                    >
+                      {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                      {copied ? 'Copied!' : 'Copy'}
+                    </Button>
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Professional Product Description Section */}
-        <section className="mb-16">
-          <div className="bg-white rounded-3xl shadow-luxury border border-muted/20 overflow-hidden">
-            <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-8 text-white">
-              <h2 className="text-3xl font-bold flex items-center gap-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                  📋
-                </div>
-                Product Details
-              </h2>
-              <p className="text-slate-200 mt-2">Everything you need to know about this product</p>
-            </div>
-            
-            <div className="p-8">
-              {product.is_amazon_product ? (
-                <div className="space-y-8">
-                  {product.long_description_amazon ? (
-                    <div className="prose prose-lg max-w-none">
-                      <div 
-                        className="text-slate-700 leading-relaxed"
-                        dangerouslySetInnerHTML={{ 
-                          __html: product.long_description_amazon.replace(/\n/g, '<br/>') 
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="text-6xl mb-4">📦</div>
-                      <h3 className="text-xl font-semibold text-slate-800 mb-2">Amazon Product</h3>
-                      <p className="text-slate-600 max-w-md mx-auto">
-                        Complete product details and specifications are available on Amazon. 
-                        Click the button above to view full information.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Professional Amazon Features Grid */}
-                  <div className="grid md:grid-cols-2 gap-6 mt-8 pt-8 border-t border-slate-200">
-                    <div className="space-y-4">
-                      <h4 className="font-bold text-slate-800 text-lg">Amazon Benefits</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                          <Shield className="h-5 w-5 text-blue-600" />
-                          <span className="text-slate-700">A-to-Z Purchase Protection</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                          <Truck className="h-5 w-5 text-green-600" />
-                          <span className="text-slate-700">Prime Eligible Shipping</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                          <Star className="h-5 w-5 text-purple-600" />
-                          <span className="text-slate-700">Customer Reviews & Ratings</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <h4 className="font-bold text-slate-800 text-lg">Why Buy from Amazon?</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                          <RefreshCw className="h-5 w-5 text-orange-600" />
-                          <span className="text-slate-700">Easy Returns & Exchanges</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg">
-                          <Shield className="h-5 w-5 text-indigo-600" />
-                          <span className="text-slate-700">Secure Payment Options</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
-                          <Star className="h-5 w-5 text-emerald-600" />
-                          <span className="text-slate-700">Trusted Global Platform</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="prose prose-lg max-w-none">
-                  {product.description ? (
-                    <div 
-                      className="text-slate-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{ 
-                        __html: product.description.replace(/\n/g, '<br/>') 
-                      }}
-                    />
-                  ) : (
-                    <p className="text-slate-600 text-center py-8">
-                      Product description will be available soon.
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
           </div>
-        </section>
+        )}
 
         {/* Professional Similar Products Section */}
         {similarProducts.length > 0 && (
-          <section className="mb-16">
+          <section className="mb-16 animate-fade-in delay-500">
             <div className="bg-white rounded-3xl shadow-luxury border border-muted/20 overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
                 <h2 className="text-3xl font-bold flex items-center gap-3">
