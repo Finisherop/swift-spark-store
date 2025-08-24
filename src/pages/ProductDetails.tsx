@@ -366,7 +366,7 @@ export default function ProductDetails() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
                   <p className="text-lg text-foreground leading-relaxed font-medium text-center">
-                    {product.short_description || product.description}
+                    {product.short_description_amazon || product.description}
                   </p>
                 </motion.div>
 
