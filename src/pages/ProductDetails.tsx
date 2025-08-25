@@ -462,81 +462,83 @@ export default function ProductDetails() {
         )}
 
         {/* Similar Products Section - Only Amazon Products */}
-        {similarProducts.length > 0 && product.is_amazon_product && (
-          <motion.section
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-            className="mb-16"
-          >
-            <div className="bg-white dark:bg-card rounded-3xl shadow-2xl border border-border/10 overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
-                <motion.h2 
-                  className="text-3xl font-bold flex items-center gap-3"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 1.4 }}
-                >
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                  🛍️
-                  </div>
-                  Your Search Related Products
-                </motion.h2>
-                <motion.p 
-                  className="text-indigo-100 mt-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 1.5 }}
-                >
-                  Discover products related to your search
-                </motion.p>
-              </div>
-              
-              <div className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {similarProducts.map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 1.6 + index * 0.1 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                      className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/20 overflow-hidden hover:shadow-2xl transition-all duration-300"
-                    >
-                      <div className="aspect-square p-4">
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="w-full h-full object-contain rounded-xl"
-                        />
-                      </div>
-                      <div className="p-6 space-y-4">
-                        <h3 className="font-semibold text-foreground line-clamp-2 text-lg">
-                          {product.name}
-                        </h3>
-                        <p className="text-muted-foreground text-sm line-clamp-2">
-                          {product.short_description}
-                        </p>
-                        {product.badge && (
-                          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                            {product.badge}
-                          </Badge>
-                        )}
-                        <Button
-                          onClick={() => handleBuyNowGrid(product)}
-                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl group"
-                        >
-                          View on Amazon
-                          <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
+{similarProducts.length > 0 && (
+  <motion.section
+    initial={{ opacity: 0, y: 40 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 1.2 }}
+    className="mb-16"
+  >
+    <div className="bg-white dark:bg-card rounded-3xl shadow-2xl border border-border/10 overflow-hidden">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
+        <motion.h2 
+          className="text-3xl font-bold flex items-center gap-3"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 1.4 }}
+        >
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+          🛍️
+          </div>
+          Your Search Related Products
+        </motion.h2>
+        <motion.p 
+          className="text-indigo-100 mt-2"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 1.5 }}
+        >
+          Discover products related to your search
+        </motion.p>
+      </div>
+
+      <div className="p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {similarProducts
+            .filter(product => product.is_amazon_product) // ✅ sirf amazon products
+            .map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.6 + index * 0.1 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/20 overflow-hidden hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="aspect-square p-4">
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-full object-contain rounded-xl"
+                  />
                 </div>
-              </div>
-            </div>
-          </motion.section>
-        )}
+                <div className="p-6 space-y-4">
+                  <h3 className="font-semibold text-foreground line-clamp-2 text-lg">
+                    {product.name}
+                  </h3>
+                  <p className="text-muted-foreground text-sm line-clamp-2">
+                    {product.short_description}
+                  </p>
+                  {product.badge && (
+                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                      {product.badge}
+                    </Badge>
+                  )}
+                  <Button
+                    onClick={() => handleBuyNowGrid(product)}
+                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl group"
+                  >
+                    View on Amazon
+                    <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </div>
+              </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </motion.section>
+)}
       </main>
 
       {/* Footer */}
