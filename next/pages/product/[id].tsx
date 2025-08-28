@@ -6,6 +6,7 @@ import useSWR from 'swr'
 import { useRouter } from 'next/router'
 import { fetchProduct, type Product } from '../../lib/fetchProduct'
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseEnv } from '../../lib/env'
 
 async function fetcher(id: string) {
 	const { product } = await fetchProduct(id)
@@ -125,8 +126,7 @@ export default function ProductDetailPage({ product, id }: Props) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const { url: supabaseUrl, anon: supabaseAnonKey } = getSupabaseEnv()
   if (!supabaseUrl || !supabaseAnonKey) {
     return { paths: [], fallback: 'blocking' }
   }
@@ -147,8 +147,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const id = String(params?.id || '')
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const { url: supabaseUrl, anon: supabaseAnonKey } = getSupabaseEnv()
   if (!supabaseUrl || !supabaseAnonKey) {
     return { props: { product: null, id }, revalidate: 60 }
   }

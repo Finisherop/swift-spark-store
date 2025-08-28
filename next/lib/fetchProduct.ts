@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseEnv } from './env'
 
 export type Product = {
 	id: string
@@ -26,8 +27,7 @@ export async function fetchProduct(productId: string) {
 		return { product: null as Product | null, error: new Error('Missing productId') }
 	}
 
-	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-	const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+	const { url: supabaseUrl, anon: supabaseAnonKey } = getSupabaseEnv()
 	if (!supabaseUrl || !supabaseAnonKey) {
 		return { product: null as Product | null, error: new Error('Supabase env not configured') }
 	}
