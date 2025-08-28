@@ -16,11 +16,11 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
     compression({
       algorithm: 'gzip',
-      exclude: [/\.(br)$ /, /\.(gz)$/],
+      exclude: [/\.br$/, /\.gz$/],
     }),
     compression({
       algorithm: 'brotliCompress',
-      exclude: [/\.(br)$ /, /\.(gz)$/],
+      exclude: [/\.br$/, /\.gz$/],
     }),
   ].filter(Boolean),
   resolve: {
