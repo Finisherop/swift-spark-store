@@ -1,5 +1,5 @@
 import { ProductCard as ImportedProductCard } from "./product-card";
-import { Loader2 } from "lucide-react";
+import { ProductGridSkeleton } from "./product-skeleton";
 interface Product {
   id: string;
   name: string;
@@ -33,14 +33,7 @@ export function ProductGrid({
 }: ProductGridProps) {
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading amazing products...</p>
-        </div>
-      </div>
-    );
+    return <ProductGridSkeleton count={12} />;
   }
 
   if (products.length === 0) {
