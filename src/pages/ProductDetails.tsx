@@ -322,29 +322,23 @@ export default function ProductDetails() {
                           <div className="flex w-[400%] h-full">
                             {(product.amazon_image_url ? [product.amazon_image_url, ...product.images] : product.images).slice(0, 4).map((image, index) => (
                               <div key={index} className="w-1/4 h-full flex-shrink-0">
-                                <OptimizedImage
-                                  src={image}
-                                  alt={`${product.name} - Image ${index + 1}`}
-                                  containerClassName="w-full h-full rounded-2xl"
-                                  imgClassName="object-contain"
-                                  priority={index === 0}
-                                  quality={90}
-                                  webpEnabled={true}
-                                />
+                                <img
+  src={image}
+  alt={`${product.name} - Image ${index + 1}`}
+  className="w-full h-full object-contain rounded-2xl"
+  style={{ border: '3px solid red' }}
+/>
                               </div>
                             ))}
                           </div>
                         </motion.div>
                       ) : (
-                        <OptimizedImage
-                          src={product.amazon_image_url || product.images[0]}
-                          alt={product.name}
-                          containerClassName="w-full h-full rounded-2xl"
-                          imgClassName="object-contain"
-                          priority={true}
-                          quality={95}
-                          webpEnabled={true}
-                        />
+                     <img
+  src={product.amazon_image_url || product.images[0]}
+  alt={product.name}
+  className="w-full h-full object-contain rounded-2xl"
+  style={{ border: '3px solid red' }}
+/>
                       )}
                     </motion.div>
                   </div>
