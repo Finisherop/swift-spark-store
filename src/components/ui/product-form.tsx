@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./car
 import { Badge } from "./badge";
 import { X, Upload, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { SupabaseImageUploader } from "./supabase-image-uploader";
 
 interface Product {
   id: string;
