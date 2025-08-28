@@ -7,8 +7,10 @@ import { Checkbox } from "./checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 import { Badge } from "./badge";
-import { X, Upload, Trash2 } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { SupabaseImageUpload } from "./supabase-image-upload";
+import { OptimizedImage } from "./optimized-image";
 
 interface Product {
   id: string;
@@ -58,7 +60,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     long_description_amazon: ''
   });
   const [loading, setLoading] = useState(false);
-  const [newImageUrl, setNewImageUrl] = useState('');
+  // Removed manual URL input - now using Supabase upload only
 
   useEffect(() => {
     if (product) {
@@ -86,14 +88,12 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addImage = () => {
-    if (newImageUrl.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, newImageUrl.trim()]
-      }));
-      setNewImageUrl('');
-    }
+  // Handle images uploaded via Supabase
+  const handleImagesUploaded = (newUrls: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, ...newUrls]
+    }));
   };
 
   const removeImage = (index: number) => {
@@ -371,6 +371,8 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
             {/* Images */}
             <div>
               <Label>Product Images {formData.is_amazon_product ? "(Amazon + Additional)" : ""}</Label>
+              
+              {/* Amazon Image URL (keep for Amazon products) */}
               {formData.is_amazon_product && (
                 <div className="space-y-3 mb-4">
                   <Label className="text-sm">Amazon API Image URL *</Label>
@@ -385,51 +387,56 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
                   </p>
                   {formData.amazon_image_url && (
                     <div className="mt-2">
-                      <img
+                      <OptimizedImage
                         src={formData.amazon_image_url}
                         alt="Amazon Product"
-                        className="w-full h-24 object-cover rounded-lg border"
+                        className="w-full h-24 rounded-lg border"
                       />
                     </div>
                   )}
                 </div>
               )}
               
-              <div className="space-y-3">
-                <Label className="text-sm">{formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    placeholder="Enter image URL"
-                    className="flex-1"
-                  />
-                  <Button type="button" onClick={addImage} disabled={!newImageUrl.trim()}>
-                    <Upload className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
+              {/* New Supabase Image Upload System */}
+              <div className="space-y-4">
+                <Label className="text-sm">
+                  {formData.is_amazon_product ? "Additional Images (Upload to Supabase)" : "Product Images (Upload to Supabase)"}
+                </Label>
+                
+                {/* Supabase Upload Component */}
+                <SupabaseImageUpload 
+                  onImagesUploaded={handleImagesUploaded}
+                  maxFiles={5}
+                  productId={product?.id} // Auto-save if editing existing product
+                />
 
+                {/* Display Current Images */}
                 {formData.images.length > 0 && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={image}
-                          alt={`Product ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => removeImage(index)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
+                  <div className="space-y-2">
+                    <Label className="text-sm">Current Images:</Label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {formData.images.map((image, index) => (
+                        <div key={index} className="relative group">
+                          <OptimizedImage
+                            src={image}
+                            alt={`Product ${index + 1}`}
+                            className="w-full h-24 rounded-lg border"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeImage(index)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          <p className="text-xs text-muted-foreground mt-1 truncate">
+                            Supabase CDN URL
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

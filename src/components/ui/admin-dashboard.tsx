@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./car
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import { Badge } from "./badge";
 import { ProductForm } from "./product-form";
+import { OptimizedImage } from "./optimized-image";
 import { 
   Plus, 
   Package, 
@@ -269,10 +270,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <Card key={product.id}>
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <img
+                      <OptimizedImage
                         src={product.images[0]}
                         alt={product.name}
                         className="w-20 h-20 object-cover rounded-lg"
+                        lazy={true}
                       />
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center space-x-2">

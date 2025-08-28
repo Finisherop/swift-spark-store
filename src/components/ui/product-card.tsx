@@ -3,6 +3,7 @@ import { Card, CardContent } from "./card";
 import { Button } from "./button";
 import { Badge } from "./badge";
 import { ImageCarousel } from "./image-carousel";
+import { OptimizedImage } from "./optimized-image";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -109,10 +110,11 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
             />
           </div>
         ) : (
-          <img
+          <OptimizedImage
             src={product.images?.[0] || '/placeholder.svg'}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            lazy={true}
           />
         )}
         

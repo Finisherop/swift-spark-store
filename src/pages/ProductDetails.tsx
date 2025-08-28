@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/ui/header";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { ArrowLeft, ExternalLink, Check, ArrowRight, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -320,20 +321,22 @@ export default function ProductDetails() {
                           <div className="flex w-[400%] h-full">
                             {product.images.slice(0, 4).map((image, index) => (
                               <div key={index} className="w-1/4 h-full flex-shrink-0">
-                                <img
+                                <OptimizedImage
                                   src={image}
                                   alt={`${product.name} - Image ${index + 1}`}
                                   className="w-full h-full object-contain rounded-2xl"
+                                  lazy={true}
                                 />
                               </div>
                             ))}
                           </div>
                         </motion.div>
                       ) : (
-                        <img
+                        <OptimizedImage
                           src={product.images[0]}
                           alt={product.name}
                           className="w-full h-full object-contain rounded-2xl"
+                          lazy={true}
                         />
                       )}
                     </motion.div>
@@ -506,10 +509,11 @@ export default function ProductDetails() {
                 className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/20 overflow-hidden hover:shadow-2xl transition-all duration-300"
               >
                 <div className="aspect-square p-4">
-                  <img
+                  <OptimizedImage
                     src={product.images[0]}
                     alt={product.name}
                     className="w-full h-full object-contain rounded-xl"
+                    lazy={true}
                   />
                 </div>
                 <div className="p-6 space-y-4">
