@@ -235,13 +235,17 @@ export default function ProductDetails() {
         <meta property="og:description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
         <meta property="og:type" content="product" />
         <meta property="og:url" content={`${window.location.origin}/product/${product?.id}`} />
-        {product?.images?.[0] && <meta property="og:image" content={product.images[0]} />}
+        {(product?.images?.[0] || product?.amazon_image_url) && (
+          <meta property="og:image" content={product.images?.[0] || product.amazon_image_url} />
+        )}
 
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={product?.name || 'SwiftMart'} />
         <meta name="twitter:description" content={product?.short_description || product?.description || 'Premium products at SwiftMart'} />
-        {product?.images?.[0] && <meta name="twitter:image" content={product.images[0]} />}
+        {(product?.images?.[0] || product?.amazon_image_url) && (
+          <meta name="twitter:image" content={product.images?.[0] || product.amazon_image_url} />
+        )}
 
         {/* Product Schema */}
         {product && (
@@ -320,7 +324,7 @@ export default function ProductDetails() {
                           }}
                         >
                           <div className="flex w-[400%] h-full">
-                            {product.images.slice(0, 4).map((image, index) => (
+                            {(product.images && product.images.length > 0 ? product.images : [product.amazon_image_url || '/placeholder.svg']).slice(0, 4).map((image, index) => (
                               <div key={index} className="w-1/4 h-full flex-shrink-0">
                                 <OptimizedImage
                                   src={image}
@@ -334,7 +338,7 @@ export default function ProductDetails() {
                         </motion.div>
                       ) : (
                         <OptimizedImage
-                          src={product.images[0]}
+                          src={product.images?.[0] || product.amazon_image_url || '/placeholder.svg'}
                           alt={product.name}
                           className="w-full h-full object-contain rounded-2xl"
                           priority={true}
@@ -511,7 +515,7 @@ export default function ProductDetails() {
               >
                 <div className="aspect-square p-4">
                   <OptimizedImage
-                    src={product.images[0]}
+                    src={product.images?.[0] || product.amazon_image_url || '/placeholder.svg'}
                     alt={product.name}
                     className="w-full h-full object-contain rounded-xl"
                     priority={false}
