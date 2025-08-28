@@ -77,6 +77,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         original_price: product.original_price || undefined,
         discount_percentage: product.discount_percentage || 0,
         images: product.images || [],
+        badge: product.badge || undefined,
         is_amazon_product: product.is_amazon_product || false,
         is_active: product.is_active || false,
       }));

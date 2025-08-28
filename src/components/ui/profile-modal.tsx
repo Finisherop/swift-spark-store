@@ -60,12 +60,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     }
   ];
 
-  useEffect(() => {
-    if (user && open) {
-      fetchProfile();
-      fetchProductCount();
-    }
-  }, [user, open, fetchProfile, fetchProductCount]);
+// useEffect moved below to avoid using callbacks before declaration
 
   const fetchProfile = useCallback(async () => {
     if (!user) return;
@@ -99,6 +94,13 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
       console.error('Error fetching product count:', error);
     }
   }, []);
+
+  useEffect(() => {
+    if (user && open) {
+      fetchProfile();
+      fetchProductCount();
+    }
+  }, [user, open, fetchProfile, fetchProductCount]);
 
   const handleSignOut = async () => {
     await signOut();

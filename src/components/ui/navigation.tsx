@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { SwiftmartLogo } from './swiftmart-logo';
+import { AnimatedLogo } from './swiftmart-logo';
 import { cn } from '@/lib/utils';
 
 export function Navigation() {
@@ -21,8 +21,8 @@ export function Navigation() {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <SwiftmartLogo />
+          <Link href="/" className="flex items-center space-x-2" aria-label="SwiftMart Home">
+            <AnimatedLogo />
           </Link>
 
           {/* Desktop Navigation */}

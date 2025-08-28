@@ -53,7 +53,7 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen">
       <Suspense fallback={<LoadingSpinner />}>
-        <HomePageClient initialProducts={featuredProducts} />
+        <HomePageClient initialFeaturedProducts={featuredProducts} />
       </Suspense>
     </main>
   );
