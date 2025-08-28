@@ -4,6 +4,22 @@
 
 **URL**: https://lovable.dev/projects/e7623b8b-b938-459b-8792-87d5ce26d2ce
 
+## Environment Variables
+
+This project requires the following environment variables to be set:
+
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_PUBLISHABLE_KEY`: Your Supabase publishable key
+- `VITE_SUPABASE_PROJECT_ID`: Your Supabase project ID
+
+Copy `.env.example` to `.env` and fill in your values:
+
+```sh
+cp .env.example .env
+```
+
+For deployment platforms like Netlify, set these as environment variables in your deployment settings.
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
