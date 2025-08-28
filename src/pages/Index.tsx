@@ -90,19 +90,16 @@ export default function Index() {
   const trackUser = async () => {
     try {
       const userAgent = navigator.userAgent;
-      const { error } = await supabase
+      // Use insert without upsert to avoid 400 on missing unique constraints
+      await supabase
         .from('website_users')
-        .upsert({
+        .insert({
           user_ip: 'unknown',
           user_agent: userAgent,
           last_visit: new Date().toISOString()
-        }, {
-          onConflict: 'user_ip'
         });
-
-      if (error) console.error('Error tracking user:', error);
-    } catch (error) {
-      console.error('Error tracking user:', error);
+    } catch (_err) {
+      // Silently ignore any tracking errors to avoid console noise
     }
   };
 

@@ -104,7 +104,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         {product.images && product.images.length > 1 ? (
           <div className="h-full">
             <ImageCarousel 
-              images={product.images.map((u) => getPrimaryImage([u]))} 
+              images={product.images.map((u) => getPrimaryImage([u], product.amazon_image_url || '/placeholder.svg'))} 
               alt={product.name}
               autoPlay={true}
               interval={4000}
