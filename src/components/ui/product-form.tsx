@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./car
 import { Badge } from "./badge";
 import { X, Upload, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { EnhancedSupabaseUploader } from "./enhanced-supabase-uploader";
 
 interface Product {
   id: string;
@@ -369,51 +370,55 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
             </div>
 
             {/* Amazon Product Image */}
-{formData.is_amazon_product && (
-
-  <div className="space-y-3 mb-4">  
-    <SupabaseImageUploader  
-      label="Amazon Product Image"  
-      onUpload={(url) => handleInputChange('amazon_image_url', url)}  
-    />  
-    {formData.amazon_image_url && (  
-      <div className="mt-2">  
-        <img  
-          src={formData.amazon_image_url}  
-          alt="Amazon Product"  
-          className="w-full h-24 object-cover rounded-lg border"  
-        />  
-      </div>  
-    )}  
-  </div>  
-)}  {/* Additional / Normal Images */}
-
-<div className="space-y-3">  
-  <SupabaseImageUploader  
-    label={formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}  
-    onUpload={(url) => setFormData(prev => ({ ...prev, images: [...prev.images, url] }))}  
-  />  
-  {formData.images.length > 0 && (  
-    <div className="grid grid-cols-2 gap-3 mt-2">  
-      {formData.images.map((image, index) => (  
-        <div key={index} className="relative group">  
-          <img  
-            src={image}  
-            alt={`Product ${index + 1}`}  
-            className="w-full h-24 object-cover rounded-lg border"  
+      {formData.is_amazon_product && (
+        <div className="space-y-3">  
+          <EnhancedSupabaseUploader  
+            label="Amazon Product Image"  
+            onUpload={(url) => handleInputChange('amazon_image_url', url)}
+            enableFallback={true}
+            maxSizeMB={10}
           />  
-          <button  
-            type="button"  
-            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-1"  
-            onClick={() => removeImage(index)}  
-          >  
-            <Trash2 className="h-3 w-3" />  
-          </button>  
+          {formData.amazon_image_url && (  
+            <div className="mt-2">  
+              <img  
+                src={formData.amazon_image_url}  
+                alt="Amazon Product"  
+                className="w-full h-24 object-cover rounded-lg border"  
+              />  
+            </div>  
+          )}  
         </div>  
-      ))}  
-    </div>  
-  )}  
-</div>
+      )}
+
+      {/* Additional / Normal Images */}
+      <div className="space-y-3">  
+        <EnhancedSupabaseUploader  
+          label={formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}  
+          onUpload={(url) => setFormData(prev => ({ ...prev, images: [...prev.images, url] }))}
+          enableFallback={true}
+          maxSizeMB={10}
+        />  
+        {formData.images.length > 0 && (  
+          <div className="grid grid-cols-2 gap-3 mt-2">  
+            {formData.images.map((image, index) => (  
+              <div key={index} className="relative group">  
+                <img  
+                  src={image}  
+                  alt={`Product ${index + 1}`}  
+                  className="w-full h-24 object-cover rounded-lg border"  
+                />  
+                <button  
+                  type="button"  
+                  className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-1"  
+                  onClick={() => removeImage(index)}  
+                >  
+                  <Trash2 className="h-3 w-3" />  
+                </button>  
+              </div>  
+            ))}  
+          </div>  
+        )}  
+      </div>
             {/* Active Status */}
             <div className="flex items-center space-x-2">
               <input
