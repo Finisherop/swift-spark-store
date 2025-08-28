@@ -328,6 +328,8 @@ export default function ProductDetails() {
                                   containerClassName="w-full h-full rounded-2xl"
                                   imgClassName="object-contain"
                                   priority={index === 0}
+                                  quality={90}
+                                  webpEnabled={true}
                                 />
                               </div>
                             ))}
@@ -340,6 +342,8 @@ export default function ProductDetails() {
                           containerClassName="w-full h-full rounded-2xl"
                           imgClassName="object-contain"
                           priority={true}
+                          quality={95}
+                          webpEnabled={true}
                         />
                       )}
                     </motion.div>
@@ -518,6 +522,8 @@ export default function ProductDetails() {
                     containerClassName="w-full h-full rounded-xl"
                     imgClassName="object-contain"
                     priority={false}
+                    quality={80}
+                    webpEnabled={true}
                   />
                 </div>
                 <div className="p-6 space-y-4">
