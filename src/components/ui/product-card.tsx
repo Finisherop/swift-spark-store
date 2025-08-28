@@ -7,6 +7,7 @@ import { OptimizedImage } from "./optimized-image";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { getPrimaryImage } from "@/lib/image-utils";
 
 
 interface Product {
@@ -103,7 +104,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         {product.images && product.images.length > 1 ? (
           <div className="h-full">
             <ImageCarousel 
-              images={product.images} 
+              images={product.images.map((u) => getPrimaryImage([u]))} 
               alt={product.name}
               autoPlay={true}
               interval={4000}
@@ -111,7 +112,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
           </div>
         ) : (
           <OptimizedImage
-            src={product.images?.[0] || '/placeholder.svg'}
+            src={getPrimaryImage(product.images, product.amazon_image_url || '/placeholder.svg')}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             priority={false}
