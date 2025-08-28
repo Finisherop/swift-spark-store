@@ -1,7 +1,10 @@
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { ThemeProvider } from 'next-themes'
+import { Inter } from 'next/font/google'
 import '../src/index.css'
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -9,7 +12,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <Component {...pageProps} />
+      <div className={inter.className}>
+        <Component {...pageProps} />
+      </div>
     </ThemeProvider>
   )
 }
