@@ -126,7 +126,7 @@ export default function Index() {
   const handleViewDetails = (product: Product) => {
     trackClick(product.id, 'view_details');
     if (product.category === 'Fashion') {
-      window.open(product.affiliate_link, '_blank');
+      window.open(product.affiliate_link, '_blank', 'noopener');
     } else {
       navigate(`/product/${product.id}`);
     }

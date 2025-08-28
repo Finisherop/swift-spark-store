@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -11,8 +12,8 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
+    mode === 'development' && componentTagger(),
+    mode !== 'development' && visualizer({ gzipSize: true, brotliSize: true, filename: 'dist/bundle-stats.html' })
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -21,6 +22,8 @@ export default defineConfig(({ mode }) => ({
   },
   // Build configuration to ensure proper MIME types and asset handling
   build: {
+    cssCodeSplit: true,
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         // Ensure JS chunks have .js extension for proper MIME type detection
@@ -40,6 +43,12 @@ export default defineConfig(({ mode }) => ({
     manifest: true,
     // Ensure source maps are generated for debugging
     sourcemap: mode === 'development',
+    // Stronger treeshaking
+    treeshake: {
+      moduleSideEffects: false,
+      propertyReadSideEffects: false,
+      tryCatchDeoptimization: false,
+    }
   },
   // Preview server configuration for testing production builds
   preview: {

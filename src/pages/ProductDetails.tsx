@@ -52,10 +52,10 @@ export default function ProductDetails() {
     try {
       setLoading(true);
 
-      // Fetch the main product
+      // Fetch the main product with minimal fields first for faster TTFB
       const { data: productData, error: productError } = await supabase
         .from('products')
-        .select('*')
+        .select('id,name,price,original_price,discount_percentage,category,badge,affiliate_link,images,is_amazon_product,amazon_affiliate_link,amazon_image_url,short_description,short_description_amazon,long_description_amazon,amazon_url,description')
         .eq('id', productId)
         .single();
 
@@ -117,7 +117,7 @@ export default function ProductDetails() {
 
     await trackClick('buy_now');
     const linkToOpen = product.is_amazon_product ? (product.amazon_affiliate_link || product.amazon_url) : product.affiliate_link;
-    window.open(linkToOpen, '_blank');
+    window.open(linkToOpen, '_blank', 'noopener');
   };
 
   const handleViewDetails = (product: Product) => {
@@ -127,7 +127,7 @@ export default function ProductDetails() {
   const handleBuyNowGrid = async (product: Product) => {
     await trackClick('buy_now');
     const linkToOpen = product.is_amazon_product ? (product.amazon_affiliate_link || product.amazon_url) : product.affiliate_link;
-    window.open(linkToOpen, '_blank');
+    window.open(linkToOpen, '_blank', 'noopener');
   };
 
   const getBadgeVariant = (badge: string) => {

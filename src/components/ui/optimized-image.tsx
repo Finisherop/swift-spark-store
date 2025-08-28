@@ -8,6 +8,7 @@ interface OptimizedImageProps {
   width?: number;
   height?: number;
   lazy?: boolean;
+  sizes?: string;
   fallbackSrc?: string;
   onLoad?: () => void;
   onError?: () => void;
@@ -27,6 +28,7 @@ export function OptimizedImage({
   width,
   height,
   lazy = true,
+  sizes = "100vw",
   fallbackSrc = '/placeholder.svg',
   onLoad,
   onError
@@ -138,6 +140,7 @@ export function OptimizedImage({
               )}
               width={width}
               height={height}
+              sizes={sizes}
               loading={lazy ? "lazy" : "eager"}
               onLoad={handleLoad}
               onError={handleError}
