@@ -26,4 +26,4 @@ from = "/*"
   status = 200
 
 [build]
-  publish = "dist"
+  publish = ".next"
