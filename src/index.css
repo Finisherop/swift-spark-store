@@ -2,13 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    /* SwiftMart Light Green + White Professional Theme */
+    /* SwiftMart Professional Theme - Clean & Modern */
     --background: 0 0% 100%;
     --foreground: 155 25% 15%;
 
@@ -24,7 +20,6 @@ All colors MUST be HSL.
     --primary-hover: 142 76% 32%;
     --primary-light: 142 76% 92%;
 
-    /* Subtle secondary colors */
     --secondary: 155 25% 95%;
     --secondary-foreground: 155 25% 15%;
 
@@ -51,37 +46,13 @@ All colors MUST be HSL.
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 42%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(155 60% 45%) 50%, hsl(142 76% 36%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(155 25% 98%) 100%);
-
-    /* Shadows */
-    --shadow-soft: 0 2px 8px -2px hsl(155 25% 15% / 0.08);
-    --shadow-medium: 0 4px 16px -4px hsl(155 25% 15% / 0.12);
-    --shadow-strong: 0 8px 32px -8px hsl(155 25% 15% / 0.16);
-    --shadow-glow: 0 0 20px hsl(142 76% 36% / 0.2);
-
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    --radius: 0.75rem;
-
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -113,6 +84,7 @@ All colors MUST be HSL.
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -128,139 +100,16 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @layer components {
-  /* SwiftMart Custom Component Styles */
-  .hero-gradient {
-    background: var(--gradient-hero);
-  }
-  
-  .card-gradient {
-    background: var(--gradient-card);
-  }
-  
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
-  }
-  
-  .shadow-medium {
-    box-shadow: var(--shadow-medium);
-  }
-  
-  .shadow-strong {
-    box-shadow: var(--shadow-strong);
-  }
-  
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
-  }
-
-  .shadow-luxury {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  }
-  
-  .transition-smooth {
-    transition: var(--transition-smooth);
-  }
-  
-  .transition-bounce {
-    transition: var(--transition-bounce);
-  }
-
-  /* Product Card Hover Effects */
-  .product-card {
-    @apply relative overflow-hidden rounded-xl card-gradient shadow-soft transition-smooth;
-  }
-  
-  .product-card:hover {
-    @apply shadow-medium scale-[1.02];
-  }
-  
-  .product-card::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] transition-transform duration-700;
-  }
-  
-  .product-card:hover::before {
-    @apply translate-x-[100%];
-  }
-
-  /* Badge Styles */
-  .badge-new {
-    @apply bg-info text-info-foreground;
-  }
-  
-  .badge-bestseller {
-    @apply bg-success text-success-foreground;
-  }
-  
-  .badge-trending {
-    @apply bg-warning text-warning-foreground;
-  }
-  
-  .badge-limited {
-    @apply bg-destructive text-destructive-foreground;
-  }
-
-  /* Animations */
-  .animate-fade-in {
-    animation: fade-in 0.6s ease-out forwards;
-  }
-  
-  .animate-slide-up {
-    animation: slide-up 0.8s ease-out forwards;
-  }
-  
-  .animate-bounce-in {
-    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-  }
-}
-
-@layer utilities {
-  /* Custom utility classes for SwiftMart */
   .text-gradient {
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 42%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-}
-
-/* Custom Keyframes */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes bounce-in {
-  from {
-    opacity: 0;
-    transform: scale(0.8) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
   }
 }
