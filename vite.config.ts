@@ -1,30 +1,23 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import path from 'path'
+import { componentTagger } from "lovable-tagger"
 
-// Minimal Vite config for Lovable plugin support only
-// This project primarily uses Next.js for optimization
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
+  plugins: [
+    react(),
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./src"),
-      "@/components": resolve(__dirname, "./src/components"), 
-      "@/lib": resolve(__dirname, "./src/lib"),
-      "@/hooks": resolve(__dirname, "./src/hooks"),
-      "@/integrations": resolve(__dirname, "./src/integrations"),
-      "@/app": resolve(__dirname, "./src/app")
+      "@": path.resolve(__dirname, "./src"),
     },
-  },
-  server: {
-    port: 8080,
-    host: true,
   },
   build: {
     outDir: 'dist',
-    sourcemap: false, // Disable for faster builds
-    rollupOptions: {
-      external: ['next', 'next/router', 'next/navigation'] // Exclude Next.js from bundling
-    }
-  }
-})
+  },
+}))
