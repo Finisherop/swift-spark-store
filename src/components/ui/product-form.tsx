@@ -395,45 +395,41 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
                 </div>
               )}
               
-              <div className="space-y-3">
-                <Label className="text-sm">{formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    placeholder="Enter image URL"
-                    className="flex-1"
-                  />
-                  <Button type="button" onClick={addImage} disabled={!newImageUrl.trim()}>
-                    <Upload className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
+             <div className="space-y-3">
+  <Label className="text-sm">{formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}</Label>
 
-                {formData.images.length > 0 && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={image}
-                          alt={`Product ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => removeImage(index)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+  <SupabaseImageUploader
+    onUpload={(url) => setFormData(prev => ({ ...prev, images: [...prev.images, url] }))}
+  />
+
+  {formData.images.length > 0 && (
+    <div className="grid grid-cols-2 gap-3 mt-2">
+      {formData.images.map((image, index) => (
+        <div key={index} className="relative group">
+          <img
+            src={image}
+            alt={`Product ${index + 1}`}
+            className="w-full h-24 object-cover rounded-lg border"
+          />
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => {
+              setFormData(prev => ({
+                ...prev,
+                images: prev.images.filter((_, i) => i !== index)
+              }))
+            }}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
             {/* Active Status */}
             <div className="flex items-center space-x-2">
