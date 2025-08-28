@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/ui/header";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { ArrowLeft, ExternalLink, Check, ArrowRight, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -65,7 +66,7 @@ export default function ProductDetails() {
 
       setProduct(productData);
 
-      // Fetch similar products - only Amazon products if current is Amazon
+      // Fetch similar products - show ALL Amazon products if current is Amazon
       let query = supabase
         .from('products')
         .select('*')
@@ -73,12 +74,13 @@ export default function ProductDetails() {
         .eq('is_active', true);
 
       if (productData.is_amazon_product) {
+        // Show ALL Amazon products, not just limited to 4
         query = query.eq('is_amazon_product', true);
       } else {
         query = query.eq('category', productData.category);
       }
 
-      const { data: similarData, error: similarError } = await query.limit(4);
+      const { data: similarData, error: similarError } = await query;
 
       if (!similarError && similarData) {
         setSimilarProducts(similarData);
@@ -320,20 +322,22 @@ export default function ProductDetails() {
                           <div className="flex w-[400%] h-full">
                             {product.images.slice(0, 4).map((image, index) => (
                               <div key={index} className="w-1/4 h-full flex-shrink-0">
-                                <img
+                                <OptimizedImage
                                   src={image}
                                   alt={`${product.name} - Image ${index + 1}`}
                                   className="w-full h-full object-contain rounded-2xl"
+                                  priority={index === 0}
                                 />
                               </div>
                             ))}
                           </div>
                         </motion.div>
                       ) : (
-                        <img
+                        <OptimizedImage
                           src={product.images[0]}
                           alt={product.name}
                           className="w-full h-full object-contain rounded-2xl"
+                          priority={true}
                         />
                       )}
                     </motion.div>
@@ -480,7 +484,7 @@ export default function ProductDetails() {
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
           🛍️
           </div>
-          Your Search Related Products
+          All Amazon Products
         </motion.h2>
         <motion.p 
           className="text-indigo-100 mt-2"
@@ -488,14 +492,14 @@ export default function ProductDetails() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 1.5 }}
         >
-          Discover products related to your search
+          Discover all our curated Amazon products
         </motion.p>
       </div>
 
       <div className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
           {similarProducts
-            .filter(product => product.is_amazon_product) // ✅ sirf amazon products
+            .filter(product => product.is_amazon_product) // ✅ Show all Amazon products
             .map((product, index) => (
               <motion.div
                 key={product.id}
@@ -506,10 +510,11 @@ export default function ProductDetails() {
                 className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/20 overflow-hidden hover:shadow-2xl transition-all duration-300"
               >
                 <div className="aspect-square p-4">
-                  <img
+                  <OptimizedImage
                     src={product.images[0]}
                     alt={product.name}
                     className="w-full h-full object-contain rounded-xl"
+                    priority={false}
                   />
                 </div>
                 <div className="p-6 space-y-4">
