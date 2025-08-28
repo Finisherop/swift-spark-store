@@ -39,6 +39,7 @@ export default function ProductDetails() {
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   
 
   useEffect(() => {
@@ -58,9 +59,10 @@ export default function ProductDetails() {
         .eq('id', productId)
         .single();
 
-      if (productError) {
+      if (productError || !productData) {
         console.error('Error fetching product:', productError);
-        navigate('/');
+        setNotFound(true);
+        setProduct(null);
         return;
       }
 
@@ -87,7 +89,7 @@ export default function ProductDetails() {
 
     } catch (error) {
       console.error('Error:', error);
-      navigate('/');
+      setNotFound(true);
     } finally {
       setLoading(false);
     }
