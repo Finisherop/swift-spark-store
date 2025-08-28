@@ -14,14 +14,15 @@ import { usePerformance } from "@/hooks/usePerformance";
 interface Product {
   id: string;
   name: string;
-  short_description: string;
+  short_description: string | null;
   price: number;
-  original_price?: number;
-  discount_percentage: number;
+  original_price?: number | null;
+  discount_percentage: number | null;
   category: string;
-  badge?: string;
+  badge?: string | null;
   affiliate_link: string;
-  images: string[];
+  images: string[] | null;
+  is_amazon_product?: boolean | null;
 }
 
 const ADMIN_EMAIL = "akk116636@gmail.com";
@@ -51,36 +52,76 @@ export default function Index() {
   }, [products, searchQuery, selectedCategory]);
 
   const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
+    setLoading(true);
+    const CACHE_KEY = 'swiftmart_products_cache_v1';
+    const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+    const readCache = () => {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw) as { ts: number; data: Product[] };
+        if (Date.now() - parsed.ts < CACHE_TTL_MS) return parsed.data;
+        return null;
+      } catch {
+        return null;
+      }
+    };
+
+    const writeCache = (data: Product[]) => {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+      } catch {}
+    };
+
+    const attemptFetch = async () => {
+      return supabase
         .from('products')
         .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
+    };
 
+    try {
+      // Optimistic render from cache for faster first paint
+      const cached = readCache();
+      if (cached && cached.length > 0) {
+        setProducts(cached);
+      }
+
+      // Network fetch with a simple retry
+      let { data, error } = await attemptFetch();
+      if (error) {
+        // retry once
+        ({ data, error } = await attemptFetch());
+      }
       if (error) throw error;
-      
-      const productsData = data || [];
+
+      const productsData = (data || []) as Product[];
       setProducts(productsData);
+      writeCache(productsData);
 
       // Preload images for better performance
       if (productsData.length > 0 && !shouldLazyLoad()) {
         const imageUrls = productsData
           .flatMap(product => product.images || [])
-          .filter(Boolean);
-        
+          .filter(Boolean) as string[];
         if (imageUrls.length > 0) {
           preloadImages(imageUrls).catch(console.error);
         }
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load products. Please try again.",
-        variant: "destructive"
-      });
+      const cached = readCache();
+      if (cached && cached.length > 0) {
+        setProducts(cached);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load products. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -106,18 +147,20 @@ export default function Index() {
   };
 
   const filterProducts = () => {
-    let filtered = products;
+    let filtered = products.slice();
 
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      filtered = filtered.filter(product => (product.category || '').toLowerCase() === selectedCategory.toLowerCase());
     }
 
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.short_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      filtered = filtered.filter(product => {
+        const name = (product.name || '').toLowerCase();
+        const shortDesc = (product.short_description || '').toLowerCase();
+        const category = (product.category || '').toLowerCase();
+        return name.includes(query) || shortDesc.includes(query) || category.includes(query);
+      });
     }
 
     setFilteredProducts(filtered);
