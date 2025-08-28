@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "./button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
@@ -65,9 +65,9 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
       fetchProfile();
       fetchProductCount();
     }
-  }, [user, open]);
+  }, [user, open, fetchProfile, fetchProductCount]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -84,9 +84,9 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const fetchProductCount = async () => {
+  const fetchProductCount = useCallback(async () => {
     try {
       const { count, error } = await supabase
         .from('products')
@@ -98,7 +98,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     } catch (error) {
       console.error('Error fetching product count:', error);
     }
-  };
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
