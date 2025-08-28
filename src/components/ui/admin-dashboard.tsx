@@ -83,7 +83,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       if (!clicksError && clicksData) {
         const statsMap = new Map<string, ClickStats>();
         
-        clicksData.forEach((click: any) => {
+        type ProductClickRow = {
+          product_id: string
+          click_type: 'view_details' | 'buy_now' | string
+          products: { name: string }
+        }
+
+        clicksData.forEach((click: ProductClickRow) => {
           const productId = click.product_id;
           const productName = click.products.name;
           
