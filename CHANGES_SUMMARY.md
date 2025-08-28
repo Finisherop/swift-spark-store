@@ -107,20 +107,25 @@ Successfully replaced the entire image handling system with a modern Supabase-ba
 
 ### 6. **Hero Section** (`src/components/ui/hero-section.tsx`)
 ```typescript
-// BEFORE: Hardcoded static image paths
-const fashionHoodie = "/lovable-uploads/563d724a-36dd-42a4-89fe-dd6da4112a9f.png";
-const beautyProducts = "/lovable-uploads/21d04899-2269-45bd-ab8f-2ef307047715.png";
+// BEFORE: Basic img background with CSS
+<div style={{ backgroundImage: `url(${currentHero.bgImage})` }}>
 
-// AFTER: Documentation for Supabase usage
-// Note: All images are now handled through Supabase Storage
-// To update hero images, upload new ones via the admin panel and update these paths
-// with the new Supabase public URLs generated after upload
+// AFTER: OptimizedImage component with lazy loading disabled for hero
+<OptimizedImage
+  src={currentHero.bgImage}
+  alt={`Background for ${currentHero.title}`}
+  className="w-full h-full object-cover"
+  lazy={false} // Hero images load immediately
+/>
 ```
 
 **Key Changes:**
-- ❌ Removed hardcoded static image references
-- ✅ Added documentation for Supabase image usage
-- ✅ Prepared for dynamic Supabase URLs
+- ✅ Kept existing static images functional during transition period
+- ✅ Replaced CSS background-image with OptimizedImage component
+- ✅ Added proper alt text for accessibility
+- ✅ Disabled lazy loading for hero images (immediate visibility)
+- ✅ Added WebP/AVIF optimization for hero backgrounds
+- ✅ Prepared for easy migration to Supabase URLs later
 
 ---
 
