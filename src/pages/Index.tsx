@@ -55,9 +55,10 @@ export default function Index() {
       setLoading(true);
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('id,name,short_description,price,original_price,discount_percentage,category,badge,affiliate_link,images,is_amazon_product,amazon_affiliate_link,amazon_image_url,short_description_amazon')
         .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(60);
 
       if (error) throw error;
       
@@ -140,11 +141,7 @@ export default function Index() {
 
   const handleViewDetails = (product: Product) => {
     trackClick(product.id, 'view_details');
-    if (product.category === 'Fashion') {
-      window.open(product.affiliate_link, '_blank');
-    } else {
-      navigate(`/product/${product.id}`);
-    }
+    navigate(`/product/${product.id}`);
   };
 
   const handleBuyNow = (product: Product) => {

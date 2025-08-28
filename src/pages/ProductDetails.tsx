@@ -54,7 +54,7 @@ export default function ProductDetails() {
       // Fetch the main product
       const { data: productData, error: productError } = await supabase
         .from('products')
-        .select('*')
+        .select('id,name,description,short_description,price,original_price,discount_percentage,category,badge,affiliate_link,images,is_amazon_product,amazon_affiliate_link,amazon_image_url,short_description_amazon,long_description_amazon,amazon_url')
         .eq('id', productId)
         .single();
 
@@ -66,7 +66,7 @@ export default function ProductDetails() {
 
       setProduct(productData);
 
-      // Fetch similar products - show ALL Amazon products if current is Amazon
+      // Fetch similar products - cap to 24 for speed
       let query = supabase
         .from('products')
         .select('*')
@@ -80,7 +80,7 @@ export default function ProductDetails() {
         query = query.eq('category', productData.category);
       }
 
-      const { data: similarData, error: similarError } = await query;
+      const { data: similarData, error: similarError } = await query.limit(24);
 
       if (!similarError && similarData) {
         setSimilarProducts(similarData);
