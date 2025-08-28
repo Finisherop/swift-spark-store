@@ -4,13 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import useSWR from 'swr'
 import { useRouter } from 'next/router'
-import { fetchProduct, type Product } from '@/../next/lib/fetchProduct'
+import { fetchProduct, type Product } from '../../lib/fetchProduct'
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-	process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-)
 
 async function fetcher(id: string) {
 	const { product } = await fetchProduct(id)
@@ -130,11 +125,17 @@ export default function ProductDetailPage({ product, id }: Props) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-	const { data } = await supabase
-		.from('products')
-		.select('id')
-		.eq('is_active', true)
-		.limit(50)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { paths: [], fallback: 'blocking' }
+  }
+  const supabase = createClient(supabaseUrl, supabaseAnonKey)
+  const { data } = await supabase
+    .from('products')
+    .select('id')
+    .eq('is_active', true)
+    .limit(50)
 
 	const paths = data?.map((p) => ({ params: { id: String(p.id) } })) ?? []
 
@@ -145,8 +146,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
-	const id = String(params?.id || '')
-	const { product } = await fetchProduct(id)
+  const id = String(params?.id || '')
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { props: { product: null, id }, revalidate: 60 }
+  }
+  const { product } = await fetchProduct(id)
 
 	if (!product) {
 		return {

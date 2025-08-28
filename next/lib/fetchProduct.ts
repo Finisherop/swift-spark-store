@@ -21,15 +21,17 @@ export type Product = {
 	is_active?: boolean
 }
 
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
 export async function fetchProduct(productId: string) {
 	if (!productId) {
 		return { product: null as Product | null, error: new Error('Missing productId') }
 	}
+
+	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+	const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+	if (!supabaseUrl || !supabaseAnonKey) {
+		return { product: null as Product | null, error: new Error('Supabase env not configured') }
+	}
+	const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 	const { data, error } = await supabase
 		.from('products')
