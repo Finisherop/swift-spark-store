@@ -368,69 +368,52 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
               />
             </div>
 
-            {/* Images */}
-            <div>
-              <Label>Product Images {formData.is_amazon_product ? "(Amazon + Additional)" : ""}</Label>
-              {formData.is_amazon_product && (
-                <div className="space-y-3 mb-4">
-                  <Label className="text-sm">Amazon API Image URL *</Label>
-                  <Input
-                    value={formData.amazon_image_url}
-                    onChange={(e) => handleInputChange('amazon_image_url', e.target.value)}
-                    placeholder="Enter Amazon API image URL"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Use only Amazon API provided image URLs for compliance
-                  </p>
-                  {formData.amazon_image_url && (
-                    <div className="mt-2">
-                      <img
-                        src={formData.amazon_image_url}
-                        alt="Amazon Product"
-                        className="w-full h-24 object-cover rounded-lg border"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-              
-             <div className="space-y-3">
-  <Label className="text-sm">{formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}</Label>
+            {/* Amazon Product Image */}
+{formData.is_amazon_product && (
 
-  <SupabaseImageUploader
-    onUpload={(url) => setFormData(prev => ({ ...prev, images: [...prev.images, url] }))}
-  />
+  <div className="space-y-3 mb-4">  
+    <SupabaseImageUploader  
+      label="Amazon Product Image"  
+      onUpload={(url) => handleInputChange('amazon_image_url', url)}  
+    />  
+    {formData.amazon_image_url && (  
+      <div className="mt-2">  
+        <img  
+          src={formData.amazon_image_url}  
+          alt="Amazon Product"  
+          className="w-full h-24 object-cover rounded-lg border"  
+        />  
+      </div>  
+    )}  
+  </div>  
+)}  {/* Additional / Normal Images */}
 
-  {formData.images.length > 0 && (
-    <div className="grid grid-cols-2 gap-3 mt-2">
-      {formData.images.map((image, index) => (
-        <div key={index} className="relative group">
-          <img
-            src={image}
-            alt={`Product ${index + 1}`}
-            className="w-full h-24 object-cover rounded-lg border"
-          />
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={() => {
-              setFormData(prev => ({
-                ...prev,
-                images: prev.images.filter((_, i) => i !== index)
-              }))
-            }}
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ))}
-    </div>
-  )}
+<div className="space-y-3">  
+  <SupabaseImageUploader  
+    label={formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}  
+    onUpload={(url) => setFormData(prev => ({ ...prev, images: [...prev.images, url] }))}  
+  />  
+  {formData.images.length > 0 && (  
+    <div className="grid grid-cols-2 gap-3 mt-2">  
+      {formData.images.map((image, index) => (  
+        <div key={index} className="relative group">  
+          <img  
+            src={image}  
+            alt={`Product ${index + 1}`}  
+            className="w-full h-24 object-cover rounded-lg border"  
+          />  
+          <button  
+            type="button"  
+            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-1"  
+            onClick={() => removeImage(index)}  
+          >  
+            <Trash2 className="h-3 w-3" />  
+          </button>  
+        </div>  
+      ))}  
+    </div>  
+  )}  
 </div>
-
             {/* Active Status */}
             <div className="flex items-center space-x-2">
               <input
