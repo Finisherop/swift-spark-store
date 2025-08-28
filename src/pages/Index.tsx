@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/ui/header";
 import { Navigation } from "@/components/ui/navigation";
@@ -42,13 +42,13 @@ export default function Index() {
   useEffect(() => {
     fetchProducts();
     trackUser();
-  }, []);
+  }, [fetchProducts, trackUser]);
 
   useEffect(() => {
     filterProducts();
-  }, [products, searchQuery, selectedCategory]);
+  }, [products, searchQuery, selectedCategory, filterProducts]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -69,9 +69,9 @@ export default function Index() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const trackUser = async () => {
+  const trackUser = useCallback(async () => {
     try {
       const userAgent = navigator.userAgent;
       const { error } = await supabase
@@ -88,9 +88,9 @@ export default function Index() {
     } catch (error) {
       console.error('Error tracking user:', error);
     }
-  };
+  }, []);
 
-  const filterProducts = () => {
+  const filterProducts = useCallback(() => {
     let filtered = products;
 
     if (selectedCategory !== "all") {
@@ -106,7 +106,7 @@ export default function Index() {
     }
 
     setFilteredProducts(filtered);
-  };
+  }, [products, selectedCategory, searchQuery]);
 
   const trackClick = async (productId: string, clickType: 'view_details' | 'buy_now') => {
     try {
