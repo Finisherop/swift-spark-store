@@ -6,17 +6,17 @@ export interface Product {
   description: string;
   short_description: string;
   price: number;
-  original_price?: number;
+  original_price?: number | null;
   discount_percentage: number;
   category: string;
-  badge?: string;
+  badge?: string | null;
   affiliate_link: string;
   images: string[];
   is_amazon_product?: boolean;
-  amazon_affiliate_link?: string;
-  amazon_image_url?: string;
-  short_description_amazon?: string;
-  long_description_amazon?: string;
+  amazon_affiliate_link?: string | null;
+  amazon_image_url?: string | null;
+  short_description_amazon?: string | null;
+  long_description_amazon?: string | null;
   amazon_url?: string;
   is_active: boolean;
   created_at: string;
@@ -60,7 +60,16 @@ export async function fetchProduct(productId: string): Promise<Product | null> {
     }
 
     console.log('✅ Product fetched successfully:', product.name);
-    return product;
+    return {
+      ...product,
+      description: product.description || '',
+      short_description: product.short_description || '',
+      original_price: product.original_price || undefined,
+      discount_percentage: product.discount_percentage || 0,
+      images: product.images || [],
+      is_amazon_product: product.is_amazon_product || false,
+      is_active: product.is_active || false,
+    };
   } catch (error) {
     console.error('💥 Unexpected error fetching product:', error);
     return null;
@@ -101,7 +110,16 @@ export async function fetchSimilarProducts(
     }
 
     console.log(`✅ Found ${similarProducts?.length || 0} similar products`);
-    return similarProducts || [];
+    return (similarProducts || []).map(product => ({
+      ...product,
+      description: product.description || '',
+      short_description: product.short_description || '',
+      original_price: product.original_price || undefined,
+      discount_percentage: product.discount_percentage || 0,
+      images: product.images || [],
+      is_amazon_product: product.is_amazon_product || false,
+      is_active: product.is_active || false,
+    }));
   } catch (error) {
     console.error('💥 Unexpected error fetching similar products:', error);
     return [];
@@ -156,7 +174,16 @@ export async function fetchFeaturedProducts(limit: number = 8): Promise<Product[
     }
 
     console.log(`✅ Found ${products?.length || 0} featured products`);
-    return products || [];
+    return (products || []).map(product => ({
+      ...product,
+      description: product.description || '',
+      short_description: product.short_description || '',
+      original_price: product.original_price || undefined,
+      discount_percentage: product.discount_percentage || 0,
+      images: product.images || [],
+      is_amazon_product: product.is_amazon_product || false,
+      is_active: product.is_active || false,
+    }));
   } catch (error) {
     console.error('💥 Unexpected error fetching featured products:', error);
     return [];

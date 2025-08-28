@@ -294,7 +294,7 @@ export function ProductDetailsClient({
                         ${product.price.toFixed(2)}
                       </span>
                       {product.badge && (
-                        <Badge variant={getBadgeVariant(product.badge)} size="sm">
+                        <Badge variant={getBadgeVariant(product.badge)}>
                           {product.badge}
                         </Badge>
                       )}

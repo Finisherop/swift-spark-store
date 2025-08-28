@@ -23,18 +23,18 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   return {
     title: product.name,
     description: product.short_description,
-    openGraph: {
-      title: product.name,
-      description: product.short_description,
-      images: product.images.length > 0 ? [{ url: product.images[0] }] : [],
-      type: 'product',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: product.name,
-      description: product.short_description,
-      images: product.images.length > 0 ? [product.images[0]] : [],
-    },
+      openGraph: {
+        title: product.name,
+        description: product.short_description || '',
+        images: product.images.length > 0 ? [{ url: product.images[0] }] : [],
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: product.name,
+        description: product.short_description || '',
+        images: product.images.length > 0 ? [product.images[0]] : [],
+      },
   };
 }
 

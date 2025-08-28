@@ -69,7 +69,19 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         .order('created_at', { ascending: false });
 
       if (productsError) throw productsError;
-      setProducts(productsData || []);
+      
+      const processedProducts = (productsData || []).map(product => ({
+        ...product,
+        description: product.description || '',
+        short_description: product.short_description || '',
+        original_price: product.original_price || undefined,
+        discount_percentage: product.discount_percentage || 0,
+        images: product.images || [],
+        is_amazon_product: product.is_amazon_product || false,
+        is_active: product.is_active || false,
+      }));
+      
+      setProducts(processedProducts);
 
       // Fetch click statistics
       const { data: clicksData, error: clicksError } = await supabase

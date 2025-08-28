@@ -1,36 +1,60 @@
-import { Metadata } from 'next';
 import { Suspense } from 'react';
+import { Metadata } from 'next';
 import { fetchFeaturedProducts } from '@/lib/products';
-import { HomePageClient } from './HomePageClient';
+import { HomePageClient } from './HomePageClient';  
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
+export const revalidate = 60; // ISR: revalidate every 60 seconds
+
+// SEO metadata with proper structure
 export const metadata: Metadata = {
-  title: 'E-Commerce Store - Best Deals & Products',
-  description: 'Discover amazing products with the best deals and fast shipping. Shop our curated collection of premium items.',
-  keywords: ['e-commerce', 'shopping', 'products', 'deals', 'online store'],
+  title: 'SwiftMart - Best Deals on Quality Products',
+  description: 'Discover amazing products with the best deals and fast shipping. Shop electronics, fashion, beauty, and more at SwiftMart.',
+  keywords: ['e-commerce', 'shopping', 'deals', 'electronics', 'fashion', 'beauty', 'home'],
+  authors: [{ name: 'SwiftMart Team' }],
+  creator: 'SwiftMart',
   openGraph: {
-    title: 'E-Commerce Store - Best Deals & Products',
+    title: 'SwiftMart - Best Deals on Quality Products',
     description: 'Discover amazing products with the best deals and fast shipping.',
     type: 'website',
-    locale: 'en_US',
+    url: 'https://your-domain.com',
+    siteName: 'SwiftMart',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'SwiftMart - Your One-Stop Shop',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'E-Commerce Store - Best Deals & Products',
+    title: 'SwiftMart - Best Deals on Quality Products',
     description: 'Discover amazing products with the best deals and fast shipping.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
-// Revalidate every 5 minutes for fresh content
-export const revalidate = 300;
-
 export default async function HomePage() {
-  // Fetch featured products for initial render
-  const featuredProducts = await fetchFeaturedProducts(12);
+  // Fetch featured products with ISR
+  const featuredProducts = await fetchFeaturedProducts(8);
 
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <HomePageClient initialFeaturedProducts={featuredProducts} />
-    </Suspense>
+    <main className="min-h-screen">
+      <Suspense fallback={<LoadingSpinner />}>
+        <HomePageClient initialProducts={featuredProducts} />
+      </Suspense>
+    </main>
   );
 }

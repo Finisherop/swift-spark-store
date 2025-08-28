@@ -129,7 +129,7 @@ export function HomePageClient({ initialFeaturedProducts }: HomePageClientProps)
                       )}
                     </div>
                     {product.discount_percentage > 0 && (
-                      <Badge variant="destructive" size="sm">
+                      <Badge variant="destructive">
                         {product.discount_percentage}% OFF
                       </Badge>
                     )}
