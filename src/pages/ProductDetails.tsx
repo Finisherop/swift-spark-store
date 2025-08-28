@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/ui/header";
-import { OptimizedImage } from "@/components/ui/optimized-image";
 import { ArrowLeft, ExternalLink, Check, ArrowRight, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -66,7 +65,7 @@ export default function ProductDetails() {
 
       setProduct(productData);
 
-      // Fetch similar products - show ALL Amazon products if current is Amazon
+      // Fetch similar products - only Amazon products if current is Amazon
       let query = supabase
         .from('products')
         .select('*')
@@ -74,13 +73,12 @@ export default function ProductDetails() {
         .eq('is_active', true);
 
       if (productData.is_amazon_product) {
-        // Show ALL Amazon products, not just limited to 4
         query = query.eq('is_amazon_product', true);
       } else {
         query = query.eq('category', productData.category);
       }
 
-      const { data: similarData, error: similarError } = await query;
+      const { data: similarData, error: similarError } = await query.limit(4);
 
       if (!similarError && similarData) {
         setSimilarProducts(similarData);
@@ -307,7 +305,7 @@ export default function ProductDetails() {
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                     >
-                      {(product.images && product.images.length > 1) ? (
+                      {product.images && product.images.length > 1 ? (
                         <motion.div
                           className="w-full h-full"
                           animate={{ 
@@ -320,25 +318,23 @@ export default function ProductDetails() {
                           }}
                         >
                           <div className="flex w-[400%] h-full">
-                            {(product.amazon_image_url ? [product.amazon_image_url, ...product.images] : product.images).slice(0, 4).map((image, index) => (
+                            {product.images.slice(0, 4).map((image, index) => (
                               <div key={index} className="w-1/4 h-full flex-shrink-0">
                                 <img
-  src={image}
-  alt={`${product.name} - Image ${index + 1}`}
-  className="w-full h-full object-contain rounded-2xl"
-  style={{ border: '3px solid red' }}
-/>
+                                  src={image}
+                                  alt={`${product.name} - Image ${index + 1}`}
+                                  className="w-full h-full object-contain rounded-2xl"
+                                />
                               </div>
                             ))}
                           </div>
                         </motion.div>
                       ) : (
-                     <img
-  src={product.amazon_image_url || product.images[0]}
-  alt={product.name}
-  className="w-full h-full object-contain rounded-2xl"
-  style={{ border: '3px solid red' }}
-/>
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-full h-full object-contain rounded-2xl"
+                        />
                       )}
                     </motion.div>
                   </div>
@@ -484,7 +480,7 @@ export default function ProductDetails() {
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
           🛍️
           </div>
-          All Amazon Products
+          Your Search Related Products
         </motion.h2>
         <motion.p 
           className="text-indigo-100 mt-2"
@@ -492,14 +488,14 @@ export default function ProductDetails() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 1.5 }}
         >
-          Discover all our curated Amazon products
+          Discover products related to your search
         </motion.p>
       </div>
 
       <div className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {similarProducts
-            .filter(product => product.is_amazon_product) // ✅ Show all Amazon products
+            .filter(product => product.is_amazon_product) // ✅ sirf amazon products
             .map((product, index) => (
               <motion.div
                 key={product.id}
@@ -510,14 +506,10 @@ export default function ProductDetails() {
                 className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/20 overflow-hidden hover:shadow-2xl transition-all duration-300"
               >
                 <div className="aspect-square p-4">
-                  <OptimizedImage
-                    src={product.amazon_image_url || product.images[0]}
+                  <img
+                    src={product.images[0]}
                     alt={product.name}
-                    containerClassName="w-full h-full rounded-xl"
-                    imgClassName="object-contain"
-                    priority={false}
-                    quality={80}
-                    webpEnabled={true}
+                    className="w-full h-full object-contain rounded-xl"
                   />
                 </div>
                 <div className="p-6 space-y-4">

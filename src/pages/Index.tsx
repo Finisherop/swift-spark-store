@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/ui/header";
 import { Navigation } from "@/components/ui/navigation";
@@ -9,7 +9,6 @@ import { AdminLogin } from "@/components/ui/admin-login";
 import { AdminDashboard } from "@/components/ui/admin-dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { usePerformance } from "@/hooks/usePerformance";
 
 interface Product {
   id: string;
@@ -39,7 +38,6 @@ export default function Index() {
   const [loginLoading, setLoginLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { preloadImages, shouldLazyLoad } = usePerformance();
 
   useEffect(() => {
     fetchProducts();
@@ -60,20 +58,7 @@ export default function Index() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
-      const productsData = data || [];
-      setProducts(productsData);
-
-      // Preload images for better performance
-      if (productsData.length > 0 && !shouldLazyLoad()) {
-        const imageUrls = productsData
-          .flatMap(product => product.images || [])
-          .filter(Boolean);
-        
-        if (imageUrls.length > 0) {
-          preloadImages(imageUrls).catch(console.error);
-        }
-      }
+      setProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast({

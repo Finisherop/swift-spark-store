@@ -3,7 +3,6 @@ import { Card, CardContent } from "./card";
 import { Button } from "./button";
 import { Badge } from "./badge";
 import { ImageCarousel } from "./image-carousel";
-import { OptimizedImage } from "./optimized-image";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -110,12 +109,10 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
             />
           </div>
         ) : (
-          <OptimizedImage
-            src={product.amazon_image_url || product.images?.[0] || '/placeholder.svg'}
+          <img
+            src={product.images?.[0] || '/placeholder.svg'}
             alt={product.name}
-            containerClassName="w-full h-full transition-transform duration-500 group-hover:scale-110"
-            imgClassName="object-cover"
-            priority={false}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         )}
         
@@ -177,7 +174,7 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-3">
+        <p className="text-sm text-muted-foreground line-clamp-2">
           {product.is_amazon_product ? product.short_description_amazon : product.short_description}
         </p>
 

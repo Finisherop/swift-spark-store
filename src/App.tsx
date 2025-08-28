@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
-import { PerformanceMonitor } from "@/components/ui/performance-monitor";
 import Index from "./pages/Index";
 import ProductDetails from "./pages/ProductDetails";
 import Contact from "./pages/Contact";
@@ -33,7 +32,6 @@ function App() {
                   </Routes>
                   <Toaster />
                   <Sonner />
-                  <PerformanceMonitor />
                 </div>
               </TooltipProvider>
             </AuthProvider>
