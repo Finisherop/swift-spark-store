@@ -11,11 +11,13 @@ export function usePerformance() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    let updateConnectionSpeed: (() => void) | null = null;
+
     // Check connection speed if available
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
       if (connection) {
-        const updateConnectionSpeed = () => {
+        updateConnectionSpeed = () => {
           if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
             setConnectionSpeed('slow');
           } else if (connection.effectiveType === '3g' || connection.effectiveType === '4g') {
@@ -34,7 +36,7 @@ export function usePerformance() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       
-      if ('connection' in navigator) {
+      if ('connection' in navigator && updateConnectionSpeed) {
         const connection = (navigator as any).connection;
         if (connection) {
           connection.removeEventListener('change', updateConnectionSpeed);

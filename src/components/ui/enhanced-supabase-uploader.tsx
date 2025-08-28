@@ -240,9 +240,9 @@ export function EnhancedSupabaseUploader({
           {uploadMethod && (
             <div className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-sm">
               {uploadMethod === "storage" ? (
-                <Cloud className="h-3 w-3 text-blue-500" title="Stored in cloud" />
+                <Cloud className="h-3 w-3 text-blue-500" />
               ) : (
-                <HardDrive className="h-3 w-3 text-gray-500" title="Stored locally" />
+                <HardDrive className="h-3 w-3 text-gray-500" />
               )}
             </div>
           )}
