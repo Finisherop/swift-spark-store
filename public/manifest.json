@@ -9,13 +9,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192x192.png",
+      "src": "/lovable-uploads/47d1547e-d93f-4fbc-a97e-46a9550448cf.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "/lovable-uploads/039e3adf-5558-4aeb-af7c-f789086de694.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
@@ -27,17 +27,6 @@
   "prefer_related_applications": false,
   "related_applications": [],
   "screenshots": [
-    {
-      "src": "/screenshot-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshot-narrow.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
+    
   ]
 }
