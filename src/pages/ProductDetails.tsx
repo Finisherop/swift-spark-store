@@ -48,50 +48,61 @@ export default function ProductDetails() {
   }, [id]);
 
   const fetchProduct = async (productId: string) => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      // Fetch the main product
-      const { data: productData, error: productError } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
-        .single();
+    // ✅ 1. Jab fetch start ho raha hai
+    console.log("🔎 Fetching product with id:", productId);
 
-      if (productError) {
-        console.error('Error fetching product:', productError);
-        navigate('/');
-        return;
-      }
+    // Fetch the main product
+    const { data: productData, error: productError } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', productId)
+      .single();
 
-      setProduct(productData);
+    // ✅ 2. Query ke result ke baad
+    console.log("📦 Product Data:", productData);
+    console.log("⚠️ Product Error:", productError);
 
-      // Fetch similar products - only Amazon products if current is Amazon
-      let query = supabase
-        .from('products')
-        .select('*')
-        .neq('id', productId)
-        .eq('is_active', true);
-
-      if (productData.is_amazon_product) {
-        query = query.eq('is_amazon_product', true);
-      } else {
-        query = query.eq('category', productData.category);
-      }
-
-      const { data: similarData, error: similarError } = await query.limit(4);
-
-      if (!similarError && similarData) {
-        setSimilarProducts(similarData);
-      }
-
-    } catch (error) {
-      console.error('Error:', error);
-      navigate('/');
-    } finally {
-      setLoading(false);
+    if (productError) {
+      console.error('Error fetching product:', productError);
+      setProduct(null); // ❌ navigate mat karo
+      return;
     }
-  };
+
+    setProduct(productData);
+
+    // Fetch similar products - only Amazon products if current is Amazon
+    let query = supabase
+      .from('products')
+      .select('*')
+      .neq('id', productId)
+      .eq('is_active', true);
+
+    if (productData.is_amazon_product) {
+      query = query.eq('is_amazon_product', true);
+    } else {
+      query = query.eq('category', productData.category);
+    }
+
+    const { data: similarData, error: similarError } = await query.limit(4);
+
+    // ✅ 3. Similar products log
+    console.log("🛍️ Similar Products Data:", similarData);
+    console.log("⚠️ Similar Products Error:", similarError);
+
+    if (!similarError && similarData) {
+      setSimilarProducts(similarData);
+    }
+
+  } catch (error) {
+    console.error('💥 Catch Error:', error);
+    setProduct(null);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const trackClick = async (clickType: 'view_details' | 'buy_now') => {
     if (!product) return;
