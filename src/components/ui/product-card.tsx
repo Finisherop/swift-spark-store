@@ -111,9 +111,10 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
           </div>
         ) : (
           <OptimizedImage
-            src={product.images?.[0] || '/placeholder.svg'}
+            src={product.amazon_image_url || product.images?.[0] || '/placeholder.svg'}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            containerClassName="w-full h-full transition-transform duration-500 group-hover:scale-110"
+            imgClassName="object-cover"
             priority={false}
           />
         )}

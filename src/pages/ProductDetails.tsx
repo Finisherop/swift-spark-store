@@ -307,7 +307,7 @@ export default function ProductDetails() {
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                     >
-                      {product.images && product.images.length > 1 ? (
+                      {(product.images && product.images.length > 1) ? (
                         <motion.div
                           className="w-full h-full"
                           animate={{ 
@@ -320,12 +320,13 @@ export default function ProductDetails() {
                           }}
                         >
                           <div className="flex w-[400%] h-full">
-                            {product.images.slice(0, 4).map((image, index) => (
+                            {(product.amazon_image_url ? [product.amazon_image_url, ...product.images] : product.images).slice(0, 4).map((image, index) => (
                               <div key={index} className="w-1/4 h-full flex-shrink-0">
                                 <OptimizedImage
                                   src={image}
                                   alt={`${product.name} - Image ${index + 1}`}
-                                  className="w-full h-full object-contain rounded-2xl"
+                                  containerClassName="w-full h-full rounded-2xl"
+                                  imgClassName="object-contain"
                                   priority={index === 0}
                                 />
                               </div>
@@ -334,9 +335,10 @@ export default function ProductDetails() {
                         </motion.div>
                       ) : (
                         <OptimizedImage
-                          src={product.images[0]}
+                          src={product.amazon_image_url || product.images[0]}
                           alt={product.name}
-                          className="w-full h-full object-contain rounded-2xl"
+                          containerClassName="w-full h-full rounded-2xl"
+                          imgClassName="object-contain"
                           priority={true}
                         />
                       )}
@@ -511,9 +513,10 @@ export default function ProductDetails() {
               >
                 <div className="aspect-square p-4">
                   <OptimizedImage
-                    src={product.images[0]}
+                    src={product.amazon_image_url || product.images[0]}
                     alt={product.name}
-                    className="w-full h-full object-contain rounded-xl"
+                    containerClassName="w-full h-full rounded-xl"
+                    imgClassName="object-contain"
                     priority={false}
                   />
                 </div>
