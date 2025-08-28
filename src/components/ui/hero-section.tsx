@@ -3,15 +3,12 @@ import { Button } from "./button";
 import { ShoppingBag, Sparkles, Zap, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Using uploaded product images as backgrounds
-const fashionHoodie = "/lovable-uploads/563d724a-36dd-42a4-89fe-dd6da4112a9f.png";
-const beautyProducts = "/lovable-uploads/21d04899-2269-45bd-ab8f-2ef307047715.png"; 
-const sugarWater = "/lovable-uploads/47d1547e-d93f-4fbc-a97e-46a9550448cf.png";
-const hairGel = "/lovable-uploads/85401cb0-d330-48b5-80d9-8e8eed884cde.png";
-const bandTshirts = "/lovable-uploads/328f97d2-dd57-494d-aab7-e4c8053a640b.png";
-const ebook = "/lovable-uploads/039e3adf-5558-4aeb-af7c-f789086de694.png";
-const audiobook = "/lovable-uploads/936dc5df-2cf8-47b0-8208-cb5b770058d0.png";
-const proteinFoods = "/lovable-uploads/eb1cb5d5-51b0-4c70-85c8-ec1a6ffff08e.png";
+// Note: All images are now handled through Supabase Storage
+// Previous static images from /lovable-uploads/ have been removed
+// To update hero images, upload new ones via the admin panel and update these paths
+// with the new Supabase public URLs generated after upload
+// For now, using placeholder image until proper Supabase URLs are added
+const placeholderImage = "/placeholder.svg";
 
 const heroSlides = [
   {
