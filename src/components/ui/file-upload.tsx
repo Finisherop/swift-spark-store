@@ -26,9 +26,10 @@ export function FileUpload({
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newFiles = [...files, ...acceptedFiles].slice(0, maxFiles);
     setFiles(newFiles);
-    onFilesChange(newFiles);
+    // Only upload newly added files to avoid re-uploading existing ones
+    onFilesChange(acceptedFiles);
 
-    // Create previews
+    // Create previews for the newly accepted files
     const newPreviews = acceptedFiles.map(file => URL.createObjectURL(file));
     setPreviews(prev => [...prev, ...newPreviews].slice(0, maxFiles));
   }, [files, maxFiles, onFilesChange]);

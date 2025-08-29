@@ -36,7 +36,7 @@ export default function ProductDetails() {
   const {
     data: similarProducts = [],
   } = useCachedQuery<Product[]>({
-    queryKey: `similar:${id}`,
+    queryKey: `similar:${id}:${product?.category || ''}:${product?.is_amazon_product ? 1 : 0}`,
     queryFn: () => id && product ? ProductService.fetchSimilarProducts(id, product.is_amazon_product) : Promise.resolve([]),
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false

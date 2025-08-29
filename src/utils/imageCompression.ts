@@ -29,10 +29,18 @@ export const compressImage = (file: File, maxWidth = 1024, maxHeight = 1024, qua
 
 export const uploadToStorage = async (file: Blob, fileName: string): Promise<string> => {
   const { supabase } = await import('@/integrations/supabase/client');
+
+  // Ensure JPEG extension since we compress to JPEG
+  const safeName = fileName.replace(/\.[^.]+$/, '.jpg');
+  const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
   
   const { data, error } = await supabase.storage
     .from('product-images')
-    .upload(`products/${Date.now()}-${fileName}`, file);
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: 'image/jpeg'
+    });
     
   if (error) throw error;
   
