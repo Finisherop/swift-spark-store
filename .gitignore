@@ -7,18 +7,42 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependencies
+node_modules/
 
-# Editor directories and files
+# Build output
+dist/
+dist-ssr/
+
+# Local env files (keep your Supabase keys secret!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor settings
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
+
+# System files
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Netlify build cache
+.netlify/
+
+# Optional: if you use Supabase Studio locally
+.supabase/
+
+# Optional: if you use VS Code dev containers
+.devcontainer/
