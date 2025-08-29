@@ -3,11 +3,28 @@ import { Card, CardContent } from "./card";
 import { Button } from "./button";
 import { Badge } from "./badge";
 import { ImageCarousel } from "./image-carousel";
-import { OptimizedImage } from "./optimized-image";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { Product } from "@/lib/products";
+
+
+interface Product {
+  id: string;
+  name: string;
+  short_description: string;
+  price: number;
+  original_price?: number;
+  discount_percentage: number;
+  category: string;
+  badge?: string;
+  affiliate_link: string;
+  images: string[];
+  is_amazon_product?: boolean;
+  amazon_affiliate_link?: string;
+  amazon_image_url?: string;
+  short_description_amazon?: string;
+  long_description_amazon?: string;
+}
 
 interface ProductCardProps {
   product: Product;
@@ -92,11 +109,10 @@ export function ProductCard({ product, onViewDetails, onBuyNow }: ProductCardPro
             />
           </div>
         ) : (
-          <OptimizedImage
+          <img
             src={product.images?.[0] || '/placeholder.svg'}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            lazy={true}
           />
         )}
         

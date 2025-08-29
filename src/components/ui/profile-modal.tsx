@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
@@ -60,9 +60,14 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     }
   ];
 
-// useEffect moved below to avoid using callbacks before declaration
+  useEffect(() => {
+    if (user && open) {
+      fetchProfile();
+      fetchProductCount();
+    }
+  }, [user, open]);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = async () => {
     if (!user) return;
     
     try {
@@ -79,9 +84,9 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  };
 
-  const fetchProductCount = useCallback(async () => {
+  const fetchProductCount = async () => {
     try {
       const { count, error } = await supabase
         .from('products')
@@ -93,14 +98,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     } catch (error) {
       console.error('Error fetching product count:', error);
     }
-  }, []);
-
-  useEffect(() => {
-    if (user && open) {
-      fetchProfile();
-      fetchProductCount();
-    }
-  }, [user, open, fetchProfile, fetchProductCount]);
+  };
 
   const handleSignOut = async () => {
     await signOut();

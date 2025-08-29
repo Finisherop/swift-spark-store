@@ -1,26 +1,22 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// Minimal Vite config required by Lovable for preview only.
-// This does NOT affect the Next.js runtime.
+// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: '::',
+    host: "::",
     port: 8080,
   },
   plugins: [
     react(),
-    mode === 'development' && componentTagger(),
+    mode === 'development' &&
+    componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
-  },
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
   },
 }));

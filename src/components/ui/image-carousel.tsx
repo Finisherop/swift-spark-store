@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./button";
-import { OptimizedImage } from "./optimized-image";
 import { cn } from "@/lib/utils";
 
 interface ImageCarouselProps {
@@ -54,11 +53,10 @@ export function ImageCarousel({
     <div className="relative group">
       {/* Main Image */}
       <div className="aspect-square overflow-hidden rounded-xl bg-muted">
-        <OptimizedImage
+        <img
           src={images[currentIndex]}
           alt={`${alt} - ${currentIndex + 1}`}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          lazy={true}
         />
       </div>
 
@@ -117,11 +115,10 @@ export function ImageCarousel({
                   : "border-transparent hover:border-muted-foreground/30"
               )}
             >
-              <OptimizedImage
+              <img
                 src={image}
                 alt={`${alt} thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
-                lazy={true}
               />
             </button>
           ))}

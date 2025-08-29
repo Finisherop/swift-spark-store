@@ -1,6 +1,22 @@
 import { ProductCard as ImportedProductCard } from "./product-card";
-import { Product } from "@/lib/products";
 import { Loader2 } from "lucide-react";
+interface Product {
+  id: string;
+  name: string;
+  short_description: string;
+  price: number;
+  original_price?: number;
+  discount_percentage: number;
+  category: string;
+  badge?: string;
+  affiliate_link: string;
+  images: string[];
+  is_amazon_product?: boolean;
+  amazon_affiliate_link?: string;
+  amazon_image_url?: string;
+  short_description_amazon?: string;
+  long_description_amazon?: string;
+}
 
 interface ProductGridProps {
   products: Product[];
