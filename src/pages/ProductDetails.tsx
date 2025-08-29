@@ -28,8 +28,8 @@ export default function ProductDetails() {
   } = useCachedQuery<Product | null>({
     queryKey: `product:${id}`,
     queryFn: () => id ? ProductService.fetchProduct(id) : Promise.resolve(null),
-    staleTime: 60 * 1000, // 60 seconds
-    refetchOnWindowFocus: true
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+    refetchOnWindowFocus: false
   });
 
   // Use cached query for similar products

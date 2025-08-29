@@ -26,23 +26,44 @@ export interface Product {
 export class ProductService {
   // Cache for products with TTL
   private static cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
-  private static readonly DEFAULT_TTL = 60 * 1000; // 60 seconds
+  private static readonly DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
   private static setCache(key: string, data: any, ttl = this.DEFAULT_TTL) {
-    this.cache.set(key, {
+    const entry = {
       data,
       timestamp: Date.now(),
       ttl
-    });
+    };
+    this.cache.set(key, entry);
+    try {
+      localStorage.setItem(`ps_cache:${key}`, JSON.stringify(entry));
+    } catch {}
   }
 
   private static getCache(key: string) {
-    const cached = this.cache.get(key);
+    const now = Date.now();
+    let cached = this.cache.get(key);
+
+    if (!cached) {
+      try {
+        const raw = localStorage.getItem(`ps_cache:${key}`);
+        if (raw) {
+          const parsed = JSON.parse(raw) as { data: any; timestamp: number; ttl: number };
+          if (now - parsed.timestamp <= parsed.ttl) {
+            this.cache.set(key, parsed);
+            cached = parsed as any;
+          } else {
+            localStorage.removeItem(`ps_cache:${key}`);
+          }
+        }
+      } catch {}
+    }
+
     if (!cached) return null;
 
-    const now = Date.now();
     if (now - cached.timestamp > cached.ttl) {
       this.cache.delete(key);
+      try { localStorage.removeItem(`ps_cache:${key}`); } catch {}
       return null;
     }
 
@@ -63,14 +84,14 @@ export class ProductService {
         .select('*')
         .eq('id', productId)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (productError) {
-        if (productError.code === 'PGRST116') {
-          // Product not found
-          return null;
-        }
         throw productError;
+      }
+
+      if (!productData) {
+        return null;
       }
 
       this.setCache(cacheKey, productData);
@@ -87,7 +108,7 @@ export class ProductService {
     offset?: number;
   }): Promise<Product[]> {
     try {
-      const { category, limit = 50, offset = 0 } = options || {};
+      const { category, limit = 24, offset = 0 } = options || {};
       const cacheKey = `products:${category || 'all'}:${limit}:${offset}`;
       const cached = this.getCache(cacheKey);
 
@@ -132,25 +153,60 @@ export class ProductService {
       const currentProduct = await this.fetchProduct(productId);
       if (!currentProduct) return [];
 
-      let query = supabase
-        .from('products')
-        .select('*')
-        .neq('id', productId)
-        .eq('is_active', true)
-        .limit(6);
+      // Build with fallbacks for Amazon products
+      let data: Product[] | null = null;
+      let error: any = null;
 
       if (currentProduct.is_amazon_product) {
-        query = query.eq('is_amazon_product', true);
+        const res1 = await supabase
+          .from('products')
+          .select('*')
+          .neq('id', productId)
+          .eq('is_active', true)
+          .eq('is_amazon_product', true)
+          .limit(6);
+        data = res1.data; error = res1.error;
+
+        // Fallback to same category if none found
+        if (!error && (!data || data.length === 0) && currentProduct.category) {
+          const res2 = await supabase
+            .from('products')
+            .select('*')
+            .neq('id', productId)
+            .eq('is_active', true)
+            .eq('category', currentProduct.category)
+            .limit(6);
+          data = res2.data; error = res2.error;
+        }
       } else {
-        query = query.eq('category', currentProduct.category);
+        const res = await supabase
+          .from('products')
+          .select('*')
+          .neq('id', productId)
+          .eq('is_active', true)
+          .eq('category', currentProduct.category)
+          .limit(6);
+        data = res.data; error = res.error;
       }
 
-      const { data, error } = await query;
+      // Final fallback: latest active products
+      if (!error && (!data || data.length === 0)) {
+        const res3 = await supabase
+          .from('products')
+          .select('*')
+          .neq('id', productId)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(6);
+        data = res3.data; error = res3.error;
+      }
 
       if (error) throw error;
 
       const similarProducts = data || [];
-      this.setCache(cacheKey, similarProducts);
+      if (similarProducts.length > 0) {
+        this.setCache(cacheKey, similarProducts);
+      }
       return similarProducts;
     } catch (error) {
       console.error('Error fetching similar products:', error);
