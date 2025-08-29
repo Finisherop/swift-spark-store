@@ -5,14 +5,15 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: "./", // 👈 Important for Vercel (fix assets path)
+
   server: {
     host: "::",
     port: 8080,
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
+    mode === "development" && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -20,23 +21,19 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Enable code splitting for better caching
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['framer-motion', 'lucide-react'],
-          supabase: ['@supabase/supabase-js']
-        }
-      }
+          vendor: ["react", "react-dom"],
+          ui: ["framer-motion", "lucide-react"],
+          supabase: ["@supabase/supabase-js"],
+        },
+      },
     },
-    // Enable source maps for production debugging
     sourcemap: true,
-    // Optimize chunk size warnings
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
   },
-  // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'framer-motion', '@supabase/supabase-js']
-  }
+    include: ["react", "react-dom", "framer-motion", "@supabase/supabase-js"],
+  },
 }));
