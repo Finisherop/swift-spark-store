@@ -7,29 +7,16 @@ import { SearchCategorySection } from "@/components/ui/search-category-section";
 import { ProductGrid } from "@/components/ui/product-grid";
 import { AdminLogin } from "@/components/ui/admin-login";
 import { AdminDashboard } from "@/components/ui/admin-dashboard";
-import { supabase } from "@/integrations/supabase/client";
+import { ProductService, Product } from "@/services/productService";
+import { useCachedQuery } from "@/hooks/useCachedQuery";
 import { useToast } from "@/hooks/use-toast";
 
-interface Product {
-  id: string;
-  name: string;
-  short_description: string;
-  price: number;
-  original_price?: number;
-  discount_percentage: number;
-  category: string;
-  badge?: string;
-  affiliate_link: string;
-  images: string[];
-}
+// Product interface now imported from ProductService
 
 const ADMIN_EMAIL = "akk116636@gmail.com";
 const ADMIN_PASSWORD = "alikhan";
 
 export default function Index() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -39,88 +26,48 @@ export default function Index() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Use cached query for products with SWR-like behavior
+  const {
+    data: products = [],
+    loading,
+    error
+  } = useCachedQuery<Product[]>({
+    queryKey: `products:${selectedCategory}`,
+    queryFn: () => ProductService.fetchProducts({ category: selectedCategory }),
+    staleTime: 60 * 1000, // 60 seconds
+    refetchOnWindowFocus: true
+  });
+
+  // Track user visit on mount
   useEffect(() => {
-    fetchProducts();
-    trackUser();
+    ProductService.trackUserVisit();
   }, []);
 
+  // Handle fetch errors
   useEffect(() => {
-    filterProducts();
-  }, [products, searchQuery, selectedCategory]);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
+    if (error) {
       toast({
         title: "Error",
         description: "Failed to load products. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [error, toast]);
 
-  const trackUser = async () => {
-    try {
-      const userAgent = navigator.userAgent;
-      const { error } = await supabase
-        .from('website_users')
-        .upsert({
-          user_ip: 'unknown',
-          user_agent: userAgent,
-          last_visit: new Date().toISOString()
-        }, {
-          onConflict: 'user_ip'
-        });
+  // Filter products based on search and category
+  const filteredProducts = products.filter(product => {
+    const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+    const matchesSearch = !searchQuery.trim() || 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.short_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesCategory && matchesSearch;
+  });
 
-      if (error) console.error('Error tracking user:', error);
-    } catch (error) {
-      console.error('Error tracking user:', error);
-    }
-  };
-
-  const filterProducts = () => {
-    let filtered = products;
-
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(product => product.category === selectedCategory);
-    }
-
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.short_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setFilteredProducts(filtered);
-  };
-
-  const trackClick = async (productId: string, clickType: 'view_details' | 'buy_now') => {
-    try {
-      await supabase
-        .from('product_clicks')
-        .insert({
-          product_id: productId,
-          click_type: clickType,
-          user_ip: 'unknown',
-          user_agent: navigator.userAgent
-        });
-    } catch (error) {
-      console.error('Error tracking click:', error);
-    }
+  // Optimized click handlers with service
+  const trackClick = (productId: string, clickType: 'view_details' | 'buy_now') => {
+    ProductService.trackClick(productId, clickType);
   };
 
   const handleViewDetails = (product: Product) => {

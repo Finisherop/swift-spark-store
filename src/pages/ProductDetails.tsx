@@ -5,108 +5,58 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/ui/header";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { ArrowLeft, ExternalLink, Check, ArrowRight, Flame } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { ProductService, Product } from "@/services/productService";
+import { useCachedQuery } from "@/hooks/useCachedQuery";
 import { useToast } from "@/hooks/use-toast";
 
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  short_description: string;
-  price: number;
-  original_price?: number;
-  discount_percentage: number;
-  category: string;
-  badge?: string;
-  affiliate_link: string;
-  images: string[];
-  is_amazon_product?: boolean;
-  amazon_affiliate_link?: string;
-  amazon_image_url?: string;
-  short_description_amazon?: string;
-  long_description_amazon?: string;
-  amazon_url?: string;
-}
+// Product interface now imported from ProductService
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  
 
+  // Use cached query for product data with SWR-like behavior
+  const {
+    data: product,
+    loading,
+    error
+  } = useCachedQuery<Product | null>({
+    queryKey: `product:${id}`,
+    queryFn: () => id ? ProductService.fetchProduct(id) : Promise.resolve(null),
+    staleTime: 60 * 1000, // 60 seconds
+    refetchOnWindowFocus: true
+  });
+
+  // Use cached query for similar products
+  const {
+    data: similarProducts = [],
+  } = useCachedQuery<Product[]>({
+    queryKey: `similar:${id}`,
+    queryFn: () => id && product ? ProductService.fetchSimilarProducts(id, product.is_amazon_product) : Promise.resolve([]),
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false
+  });
+
+  // Handle product not found or error
   useEffect(() => {
-    if (id) {
-      fetchProduct(id);
-    }
-  }, [id]);
-
-  const fetchProduct = async (productId: string) => {
-    try {
-      setLoading(true);
-
-      // Fetch the main product
-      const { data: productData, error: productError } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
-        .single();
-
-      if (productError) {
-        console.error('Error fetching product:', productError);
-        navigate('/');
-        return;
-      }
-
-      setProduct(productData);
-
-      // Fetch similar products - only Amazon products if current is Amazon
-      let query = supabase
-        .from('products')
-        .select('*')
-        .neq('id', productId)
-        .eq('is_active', true);
-
-      if (productData.is_amazon_product) {
-        query = query.eq('is_amazon_product', true);
-      } else {
-        query = query.eq('category', productData.category);
-      }
-
-      const { data: similarData, error: similarError } = await query.limit(4);
-
-      if (!similarError && similarData) {
-        setSimilarProducts(similarData);
-      }
-
-    } catch (error) {
-      console.error('Error:', error);
+    if (error || (product === null && !loading)) {
+      toast({
+        title: "Product Not Found",
+        description: "The product you're looking for doesn't exist.",
+        variant: "destructive"
+      });
       navigate('/');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [error, product, loading, navigate, toast]);
 
   const trackClick = async (clickType: 'view_details' | 'buy_now') => {
     if (!product) return;
-
-    try {
-      await supabase
-        .from('product_clicks')
-        .insert({
-          product_id: product.id,
-          click_type: clickType,
-          user_ip: 'unknown',
-          user_agent: navigator.userAgent
-        });
-    } catch (error) {
-      console.error('Error tracking click:', error);
-    }
+    await ProductService.trackClick(product.id, clickType);
   };
 
   const handleBuyNow = async () => {
@@ -122,7 +72,7 @@ export default function ProductDetails() {
   };
 
   const handleBuyNowGrid = async (product: Product) => {
-    await trackClick('buy_now');
+    await ProductService.trackClick(product.id, 'buy_now');
     const linkToOpen = product.is_amazon_product ? (product.amazon_affiliate_link || product.amazon_url) : product.affiliate_link;
     window.open(linkToOpen, '_blank');
   };
@@ -320,20 +270,22 @@ export default function ProductDetails() {
                           <div className="flex w-[400%] h-full">
                             {product.images.slice(0, 4).map((image, index) => (
                               <div key={index} className="w-1/4 h-full flex-shrink-0">
-                                <img
+                                <OptimizedImage
                                   src={image}
                                   alt={`${product.name} - Image ${index + 1}`}
                                   className="w-full h-full object-contain rounded-2xl"
+                                  priority={index === 0}
                                 />
                               </div>
                             ))}
                           </div>
                         </motion.div>
                       ) : (
-                        <img
+                        <OptimizedImage
                           src={product.images[0]}
                           alt={product.name}
                           className="w-full h-full object-contain rounded-2xl"
+                          priority={true}
                         />
                       )}
                     </motion.div>
