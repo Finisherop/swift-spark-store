@@ -7,7 +7,7 @@ interface CacheEntry<T> {
 }
 
 class QueryCache {
-  private cache = new Map<string, CacheEntry<any>>();
+  private cache = new Map<string, CacheEntry<unknown>>();
   private readonly DEFAULT_STALE_TIME = 60 * 1000; // 60 seconds
 
   set<T>(key: string, data: T, staleTime = this.DEFAULT_STALE_TIME) {
@@ -29,7 +29,7 @@ class QueryCache {
       return null;
     }
 
-    return entry.data;
+    return entry.data as T;
   }
 
   isStale(key: string): boolean {
