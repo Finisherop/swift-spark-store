@@ -3,7 +3,6 @@
   command = "npm run build"
 
 [build.environment]
-  # Netlify ko bolo secrets scanner ignore kare
   SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_PROJECT_ID,VITE_SUPABASE_PUBLISHABLE_KEY"
 
 [[headers]]
@@ -59,12 +58,6 @@
   for = "*.html"
   [headers.values]
     Cache-Control = "public, max-age=3600"
-
-# Enable compression
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Content-Encoding = "gzip, br"
 
 # SPA redirect rules
 [[redirects]]
