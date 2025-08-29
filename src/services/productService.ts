@@ -26,10 +26,10 @@ export interface Product {
 
 export class ProductService {
   // Cache for products with TTL
-  private static cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+  private static cache = new Map<string, { data: unknown; timestamp: number; ttl: number }>();
   private static readonly DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-  private static setCache(key: string, data: any, ttl = this.DEFAULT_TTL) {
+  private static setCache<T>(key: string, data: T, ttl = this.DEFAULT_TTL) {
     const entry = {
       data,
       timestamp: Date.now(),
@@ -38,10 +38,12 @@ export class ProductService {
     this.cache.set(key, entry);
     try {
       localStorage.setItem(`ps_cache:${key}`, JSON.stringify(entry));
-    } catch {}
+    } catch (error) {
+      void error; // ignore storage failures (e.g., SSR)
+    }
   }
 
-  private static getCache(key: string) {
+  private static getCache<T>(key: string): T | null {
     const now = Date.now();
     let cached = this.cache.get(key);
 
@@ -49,32 +51,34 @@ export class ProductService {
       try {
         const raw = localStorage.getItem(`ps_cache:${key}`);
         if (raw) {
-          const parsed = JSON.parse(raw) as { data: any; timestamp: number; ttl: number };
+          const parsed = JSON.parse(raw) as { data: unknown; timestamp: number; ttl: number };
           if (now - parsed.timestamp <= parsed.ttl) {
             this.cache.set(key, parsed);
-            cached = parsed as any;
+            cached = parsed as { data: unknown; timestamp: number; ttl: number };
           } else {
             localStorage.removeItem(`ps_cache:${key}`);
           }
         }
-      } catch {}
+      } catch (error) {
+        void error; // ignore storage failures
+      }
     }
 
     if (!cached) return null;
 
     if (now - cached.timestamp > cached.ttl) {
       this.cache.delete(key);
-      try { localStorage.removeItem(`ps_cache:${key}`); } catch {}
+      try { localStorage.removeItem(`ps_cache:${key}`); } catch (error) { void error }
       return null;
     }
 
-    return cached.data;
+    return cached.data as T;
   }
 
   static async fetchProduct(productId: string): Promise<Product | null> {
     try {
       const cacheKey = `product:${productId}`;
-      const cached = this.getCache(cacheKey);
+      const cached = this.getCache<Product>(cacheKey);
       
       if (cached) {
         return cached;
@@ -95,7 +99,7 @@ export class ProductService {
         return null;
       }
 
-      this.setCache(cacheKey, productData);
+      this.setCache<Product>(cacheKey, productData);
       return productData;
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -111,7 +115,7 @@ export class ProductService {
     try {
       const { category, limit = 12, offset = 0 } = options || {};
       const cacheKey = `products:${category || 'all'}:${limit}:${offset}`;
-      const cached = this.getCache(cacheKey);
+      const cached = this.getCache<Product[]>(cacheKey);
 
       if (cached) {
         return cached;
@@ -133,7 +137,7 @@ export class ProductService {
       if (error) throw error;
 
       const products = data || [];
-      this.setCache(cacheKey, products);
+      this.setCache<Product[]>(cacheKey, products);
       return products;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -156,7 +160,7 @@ export class ProductService {
 
       // Build with fallbacks for Amazon products
       let data: Product[] | null = null;
-      let error: any = null;
+      let error: unknown = null;
 
       if (currentProduct.is_amazon_product) {
         const res1 = await supabase
@@ -202,11 +206,11 @@ export class ProductService {
         data = res3.data; error = res3.error;
       }
 
-      if (error) throw error;
+      if (error) throw error as Error;
 
       const similarProducts = data || [];
       if (similarProducts.length > 0) {
-        this.setCache(cacheKey, similarProducts);
+        this.setCache<Product[]>(cacheKey, similarProducts);
       }
       return similarProducts;
     } catch (error) {

@@ -70,6 +70,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   }, []);
 
   const fetchAnalytics = async () => {
+    interface ClickRow {
+      product_id: string;
+      click_type: 'view_details' | 'buy_now' | string;
+      products: { name: string };
+    }
     try {
       // Fetch click statistics
       const { data: clicksData, error: clicksError } = await supabase
@@ -83,7 +88,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       if (!clicksError && clicksData) {
         const statsMap = new Map<string, ClickStats>();
         
-        clicksData.forEach((click: any) => {
+        clicksData.forEach((click: ClickRow) => {
           const productId = click.product_id;
           const productName = click.products.name;
           
