@@ -230,13 +230,13 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
               {formData.is_amazon_product ? (
                 <>
                   <div>
-                    <Label htmlFor="short_description_amazon">Short Description (150-200 characters)</Label>
+                    <Label htmlFor="short_description_amazon">Short Description (150-500 characters)</Label>
                     <Input
                       id="short_description_amazon"
                       value={formData.short_description_amazon}
                       onChange={(e) => handleInputChange('short_description_amazon', e.target.value)}
                       placeholder="Brief Amazon product description for listing"
-                      maxLength={200}
+                      maxLength={500}
                     />
                   </div>
 
@@ -382,70 +382,82 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
             </div>
 
             {/* Images */}
-            <div>
-              <Label>Product Images {formData.is_amazon_product ? "(Amazon + Additional)" : ""}</Label>
-              {formData.is_amazon_product && (
-                <div className="space-y-3 mb-4">
-                  <Label className="text-sm">Amazon API Image URL *</Label>
-                  <Input
-                    value={formData.amazon_image_url}
-                    onChange={(e) => handleInputChange('amazon_image_url', e.target.value)}
-                    placeholder="Enter Amazon API image URL"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Use only Amazon API provided image URLs for compliance
-                  </p>
-                  {formData.amazon_image_url && (
-                    <div className="mt-2">
-                      <img
-                        src={formData.amazon_image_url}
-                        alt="Amazon Product"
-                        className="w-full h-24 object-cover rounded-lg border"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              <div className="space-y-3">
-                <Label className="text-sm">{formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}</Label>
-                <FileUpload 
-                  onFilesChange={handleImageUpload}
-                  maxFiles={5}
-                  accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
-                />
-                {uploading && (
-                  <div className="flex items-center justify-center p-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-                    <span className="ml-2 text-sm">Compressing and uploading images...</span>
-                  </div>
-                )}
+<div>
+  <Label>
+    Product Images {formData.is_amazon_product ? "(Amazon + Additional)" : ""}
+  </Label>
 
-                {formData.images.length > 0 && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={image}
-                          alt={`Product ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => removeImage(index)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+  {formData.is_amazon_product && (
+    <div className="space-y-3 mb-4">
+      <Label className="text-sm">Amazon API Image URL (optional)</Label>
+
+      <Input
+        value={formData.amazon_image_url}
+        onChange={(e) => handleInputChange('amazon_image_url', e.target.value)}
+        placeholder="Enter Amazon API image URL"
+      />
+
+      <p className="text-xs text-muted-foreground">
+        You can upload an image or provide Amazon API image URL.  
+        <strong>Uploaded image will take priority.</strong>
+      </p>
+
+      {formData.amazon_image_url && (
+        <div className="mt-2">
+          <img
+            src={formData.amazon_image_url}
+            alt="Amazon Product"
+            className="w-full h-24 object-cover rounded-lg border"
+          />
+        </div>
+      )}
+    </div>
+  )}
+
+  <div className="space-y-3">
+    <Label className="text-sm">
+      {formData.is_amazon_product
+        ? "Additional Images (Optional)"
+        : "Product Images"}
+    </Label>
+    <FileUpload
+      onFilesChange={handleImageUpload}
+      maxFiles={5}
+      accept={{ "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"] }}
+    />
+    {uploading && (
+      <div className="flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+        <span className="ml-2 text-sm">
+          Compressing and uploading images...
+        </span>
+      </div>
+    )}
+
+    {formData.images.length > 0 && (
+      <div className="grid grid-cols-2 gap-3">
+        {formData.images.map((image, index) => (
+          <div key={index} className="relative group">
+            <img
+              src={image}
+              alt={`Product ${index + 1}`}
+              className="w-full h-24 object-cover rounded-lg border"
+            />
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => removeImage(index)}
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
 
             {/* Active Status */}
             <div className="flex items-center space-x-2">
