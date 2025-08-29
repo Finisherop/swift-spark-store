@@ -5,8 +5,11 @@ import { Card } from "./card";
 import { X, Upload, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// ✅ Import Supabase client
+import { supabase } from "@/integrations/supabase/client";
+
 interface FileUploadProps {
-  onFilesChange: (files: File[]) => void;
+  onFilesChange: (files: string[]) => void; // ab hum string (URLs) return karenge
   maxFiles?: number;
   accept?: Record<string, string[]>;
   className?: string;
@@ -22,28 +25,50 @@ export function FileUpload({
 }: FileUploadProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const newFiles = [...files, ...acceptedFiles].slice(0, maxFiles);
     setFiles(newFiles);
-    // Only upload newly added files to avoid re-uploading existing ones
-    onFilesChange(acceptedFiles);
 
-    // Create previews for the newly accepted files
     const newPreviews = acceptedFiles.map(file => URL.createObjectURL(file));
     setPreviews(prev => [...prev, ...newPreviews].slice(0, maxFiles));
+
+    setUploading(true);
+    const uploadedUrls: string[] = [];
+
+    for (const file of acceptedFiles) {
+      const filePath = `${Date.now()}-${file.name}`;
+      const { data, error } = await supabase.storage
+        .from("product-images") // 👈 bucket name
+        .upload(filePath, file);
+
+      if (error) {
+        console.error("Upload error:", error.message);
+      } else {
+        const { data: urlData } = supabase.storage
+          .from("product-images")
+          .getPublicUrl(data.path);
+
+        if (urlData) {
+          uploadedUrls.push(urlData.publicUrl);
+        }
+      }
+    }
+
+    setUploading(false);
+
+    // Return URLs to parent component
+    onFilesChange(uploadedUrls);
   }, [files, maxFiles, onFilesChange]);
 
   const removeFile = (index: number) => {
     const newFiles = files.filter((_, i) => i !== index);
     const newPreviews = previews.filter((_, i) => i !== index);
-    
-    // Revoke object URL to prevent memory leaks
-    URL.revokeObjectURL(previews[index]);
-    
+
+    URL.revokeObjectURL(previews[index]); // memory leak avoid
     setFiles(newFiles);
     setPreviews(newPreviews);
-    onFilesChange(newFiles);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -69,7 +94,7 @@ export function FileUpload({
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
             <Upload className="h-8 w-8 text-primary" />
           </div>
-          
+
           {isDragActive ? (
             <p className="text-lg font-medium">Drop the images here...</p>
           ) : (
@@ -85,12 +110,16 @@ export function FileUpload({
               </p>
             </div>
           )}
-          
+
           {files.length < maxFiles && (
             <Button type="button" variant="outline" size="sm">
               <ImageIcon className="mr-2 h-4 w-4" />
               Choose Files
             </Button>
+          )}
+
+          {uploading && (
+            <p className="text-sm text-blue-500 mt-2">Uploading...</p>
           )}
         </div>
       </Card>
@@ -107,7 +136,7 @@ export function FileUpload({
                   className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 />
               </div>
-              
+
               <Button
                 type="button"
                 size="sm"
@@ -117,7 +146,7 @@ export function FileUpload({
               >
                 <X className="h-3 w-3" />
               </Button>
-              
+
               <p className="text-xs text-muted-foreground mt-1 truncate">
                 {files[index].name}
               </p>
