@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./car
 import { Badge } from "./badge";
 import { X, Upload, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { FileUpload } from "./file-upload";
+import { compressImage, uploadToStorage } from "@/utils/imageCompression";
 
 interface Product {
   id: string;
@@ -58,7 +60,7 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     long_description_amazon: ''
   });
   const [loading, setLoading] = useState(false);
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -86,13 +88,24 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addImage = () => {
-    if (newImageUrl.trim()) {
+  const handleImageUpload = async (files: File[]) => {
+    setUploading(true);
+    try {
+      const uploadPromises = files.map(async (file) => {
+        const compressedFile = await compressImage(file);
+        return uploadToStorage(compressedFile!, file.name);
+      });
+      
+      const urls = await Promise.all(uploadPromises);
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, newImageUrl.trim()]
+        images: [...prev.images, ...urls]
       }));
-      setNewImageUrl('');
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      alert('Failed to upload images');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -397,18 +410,17 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
               
               <div className="space-y-3">
                 <Label className="text-sm">{formData.is_amazon_product ? "Additional Images (Optional)" : "Product Images"}</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    placeholder="Enter image URL"
-                    className="flex-1"
-                  />
-                  <Button type="button" onClick={addImage} disabled={!newImageUrl.trim()}>
-                    <Upload className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
+                <FileUpload 
+                  onFilesChange={handleImageUpload}
+                  maxFiles={5}
+                  accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
+                />
+                {uploading && (
+                  <div className="flex items-center justify-center p-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                    <span className="ml-2 text-sm">Compressing and uploading images...</span>
+                  </div>
+                )}
 
                 {formData.images.length > 0 && (
                   <div className="grid grid-cols-2 gap-3">

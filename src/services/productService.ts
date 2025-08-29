@@ -137,7 +137,7 @@ export class ProductService {
         .select('*')
         .neq('id', productId)
         .eq('is_active', true)
-        .limit(4);
+        .limit(6);
 
       if (currentProduct.is_amazon_product) {
         query = query.eq('is_amazon_product', true);
