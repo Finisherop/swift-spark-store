@@ -9,6 +9,7 @@ import { AdminLogin } from "@/components/ui/admin-login";
 import { AdminDashboard } from "@/components/ui/admin-dashboard";
 import { ProductService, Product } from "@/services/productService";
 import { useCachedQuery } from "@/hooks/useCachedQuery";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 // Product interface now imported from ProductService
@@ -30,13 +31,38 @@ export default function Index() {
   const {
     data: products = [],
     loading,
-    error
+    error,
+    refetch
   } = useCachedQuery<Product[]>({
     queryKey: `products:${selectedCategory}`,
     queryFn: () => ProductService.fetchProducts({ category: selectedCategory }),
     staleTime: 60 * 1000, // 60 seconds
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: false
   });
+
+  // Real-time updates for new products
+  useEffect(() => {
+    const channel = supabase
+      .channel('product-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'products'
+        },
+        () => {
+          // Clear cache and refetch when products change
+          ProductService.clearCache('products');
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   // Track user visit on mount
   useEffect(() => {

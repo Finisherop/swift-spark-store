@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { compressImage } from '@/utils/imageCompression';
 
 export interface Product {
   id: string;
@@ -108,7 +109,7 @@ export class ProductService {
     offset?: number;
   }): Promise<Product[]> {
     try {
-      const { category, limit = 24, offset = 0 } = options || {};
+      const { category, limit = 12, offset = 0 } = options || {};
       const cacheKey = `products:${category || 'all'}:${limit}:${offset}`;
       const cached = this.getCache(cacheKey);
 
@@ -264,5 +265,34 @@ export class ProductService {
   static async preloadProducts(productIds: string[]) {
     const promises = productIds.map(id => this.fetchProduct(id).catch(() => null));
     await Promise.allSettled(promises);
+  }
+
+  static async uploadImage(file: File): Promise<string> {
+    try {
+      const compressedFile = await compressImage(file);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, compressedFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        console.error('Upload error:', error);
+        throw error;
+      }
+
+      const { data: publicData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+
+      return publicData.publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
   }
 }

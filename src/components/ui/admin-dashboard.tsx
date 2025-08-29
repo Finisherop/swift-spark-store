@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useCachedQuery } from "@/hooks/useCachedQuery";
 import { Button } from "./button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
@@ -46,30 +47,30 @@ interface ClickStats {
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [products, setProducts] = useState<Product[]>([]);
   const [clickStats, setClickStats] = useState<ClickStats[]>([]);
   const [totalUsers, setTotalUsers] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch products
-      const { data: productsData, error: productsError } = await supabase
+  const { data: products = [], loading, refetch } = useCachedQuery({
+    queryKey: 'admin-products',
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-      if (productsError) throw productsError;
-      setProducts(productsData || []);
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
 
+  const fetchAnalytics = async () => {
+    try {
       // Fetch click statistics
       const { data: clicksData, error: clicksError } = await supabase
         .from('product_clicks')
@@ -119,9 +120,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       }
 
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error fetching analytics:', error);
     }
   };
 
@@ -136,7 +135,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
       if (error) throw error;
       
-      setProducts(products.filter(p => p.id !== productId));
+      refetch();
     } catch (error) {
       console.error('Error deleting product:', error);
       alert('Failed to delete product');
@@ -152,9 +151,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
       if (error) throw error;
       
-      setProducts(products.map(p => 
-        p.id === productId ? { ...p, is_active: !isActive } : p
-      ));
+      refetch();
     } catch (error) {
       console.error('Error updating product status:', error);
       alert('Failed to update product status');
@@ -378,7 +375,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             setEditingProduct(null);
           }}
           onSave={() => {
-            fetchDashboardData();
+            refetch();
             setShowProductForm(false);
             setEditingProduct(null);
           }}
