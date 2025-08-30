@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
-
+ 
 /**
  * Custom hook to check if current user has admin role
  * Fetches the user's profile and checks for admin role
