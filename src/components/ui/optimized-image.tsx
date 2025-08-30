@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 interface OptimizedImageProps {
@@ -8,9 +9,8 @@ interface OptimizedImageProps {
   width?: number;
   height?: number;
   lazy?: boolean;
-  fallbackSrc?: string;
-  onLoad?: () => void;
-  onError?: () => void;
+  sizes?: string;
+  priority?: boolean;
 }
 
 /**
@@ -27,14 +27,11 @@ export function OptimizedImage({
   width,
   height,
   lazy = true,
-  fallbackSrc = '/placeholder.svg',
-  onLoad,
-  onError
+  sizes = "100vw",
+  priority = false,
 }: OptimizedImageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState<string>(src);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const imgRef = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(!lazy);
 
   // Intersection Observer for lazy loading
@@ -58,52 +55,11 @@ export function OptimizedImage({
     return () => observer.disconnect();
   }, [lazy, isInView]);
 
-  // Try to optimize Supabase URLs for modern formats
-  const getOptimizedSrc = (originalSrc: string): string => {
-    // Check if it's a Supabase Storage URL
-    if (originalSrc.includes('supabase.co/storage/')) {
-      // For Supabase, we can add transform parameters for optimization
-      // Note: This depends on Supabase's image transformation features
-      // You may need to enable these in your Supabase project
-      try {
-        const url = new URL(originalSrc);
-        // Add quality and format optimization parameters
-        url.searchParams.set('quality', '80');
-        url.searchParams.set('format', 'webp');
-        return url.toString();
-      } catch {
-        return originalSrc;
-      }
-    }
-    return originalSrc;
-  };
-
   const handleLoad = () => {
     setImageLoaded(true);
-    setImageError(false);
-    onLoad?.();
   };
-
-  const handleError = () => {
-    setImageError(true);
-    
-    // Try fallback strategies
-    if (currentSrc !== src && currentSrc !== fallbackSrc) {
-      // If optimized version failed, try original
-      setCurrentSrc(src);
-    } else if (currentSrc !== fallbackSrc) {
-      // If original failed, use fallback
-      setCurrentSrc(fallbackSrc);
-    }
-    
-    onError?.();
-  };
-
-  // Update src when prop changes
   useEffect(() => {
-    setCurrentSrc(getOptimizedSrc(src));
     setImageLoaded(false);
-    setImageError(false);
   }, [src]);
 
   return (
@@ -117,48 +73,21 @@ export function OptimizedImage({
       style={{ width, height }}
     >
       {isInView && (
-        <>
-          {/* Main optimized image */}
-          <picture>
-            {/* Try WebP format first (if supported) */}
-            {src.includes('supabase.co/storage/') && (
-              <source 
-                srcSet={getOptimizedSrc(src)} 
-                type="image/webp" 
-              />
-            )}
-            
-            {/* Fallback to original format */}
-            <img
-              src={currentSrc}
-              alt={alt}
-              className={cn(
-                "w-full h-full object-cover transition-opacity duration-300",
-                imageLoaded ? "opacity-100" : "opacity-0"
-              )}
-              width={width}
-              height={height}
-              loading={lazy ? "lazy" : "eager"}
-              onLoad={handleLoad}
-              onError={handleError}
-              decoding="async"
-            />
-          </picture>
-
-          {/* Loading placeholder */}
-          {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
-            </div>
+        <Image
+          src={src}
+          alt={alt}
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-300",
+            imageLoaded ? "opacity-100" : "opacity-0",
+            className
           )}
-
-          {/* Error state */}
-          {imageError && currentSrc === fallbackSrc && (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
-              <span className="text-sm">Failed to load image</span>
-            </div>
-          )}
-        </>
+          fill={Boolean(!width && !height)}
+          width={width}
+          height={height}
+          sizes={sizes}
+          priority={priority}
+          onLoad={handleLoad}
+        />
       )}
 
       {/* Lazy loading placeholder */}
