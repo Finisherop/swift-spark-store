@@ -148,7 +148,7 @@ export class ProductService {
   static async fetchSimilarProducts(productId: string, isAmazonProduct?: boolean): Promise<Product[]> {
     try {
       const cacheKey = `similar:${productId}`;
-      const cached = this.getCache(cacheKey);
+      const cached = this.getCache<Product[]>(cacheKey);
 
       if (cached) {
         return cached;

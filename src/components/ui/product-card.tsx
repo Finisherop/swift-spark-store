@@ -6,25 +6,7 @@ import { ImageCarousel } from "./image-carousel";
 import { Eye, ShoppingCart, Star, Share2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-
-interface Product {
-  id: string;
-  name: string;
-  short_description: string;
-  price: number;
-  original_price?: number;
-  discount_percentage: number;
-  category: string;
-  badge?: string;
-  affiliate_link: string;
-  images: string[];
-  is_amazon_product?: boolean;
-  amazon_affiliate_link?: string;
-  amazon_image_url?: string;
-  short_description_amazon?: string;
-  long_description_amazon?: string;
-}
+import { Product } from "@/services/productService";
 
 interface ProductCardProps {
   product: Product;

@@ -1,22 +1,6 @@
 import { ProductCard as ImportedProductCard } from "./product-card";
 import { Loader2 } from "lucide-react";
-interface Product {
-  id: string;
-  name: string;
-  short_description: string;
-  price: number;
-  original_price?: number;
-  discount_percentage: number;
-  category: string;
-  badge?: string;
-  affiliate_link: string;
-  images: string[];
-  is_amazon_product?: boolean;
-  amazon_affiliate_link?: string;
-  amazon_image_url?: string;
-  short_description_amazon?: string;
-  long_description_amazon?: string;
-}
+import { Product } from "@/services/productService";
 
 interface ProductGridProps {
   products: Product[];
@@ -50,7 +34,7 @@ export function ProductGrid({
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-xl font-semibold mb-2">No products found</h3>
           <p className="text-muted-foreground">
-            Try adjusting your search or filter criteria to find what you're looking for.
+            Try adjusting your search or filter criteria to find what you&apos;re looking for.
           </p>
         </div>
       </div>

@@ -17,22 +17,7 @@ import {
   BarChart3
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  short_description: string;
-  price: number;
-  original_price?: number;
-  discount_percentage: number;
-  category: string;
-  badge?: string;
-  affiliate_link: string;
-  images: string[];
-  is_active: boolean;
-  created_at: string;
-}
+import { Product } from "@/services/productService";
 
 interface AdminDashboardProps {
   onLogout: () => void;

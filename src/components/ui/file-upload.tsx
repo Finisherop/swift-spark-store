@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
 interface FileUploadProps {
-  onFilesChange: (files: string[]) => void; // ab hum string (URLs) return karenge
+  onFilesChange: (urls: string[]) => void; // URLs after upload
   maxFiles?: number;
   accept?: Record<string, string[]>;
   className?: string;

@@ -11,26 +11,7 @@ import { X, Upload, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { FileUpload } from "./file-upload";
 import { compressImage, uploadToStorage } from "@/utils/imageCompression";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  short_description: string;
-  price: number;
-  original_price?: number;
-  discount_percentage: number;
-  category: string;
-  badge?: string;
-  affiliate_link: string;
-  images: string[];
-  is_active: boolean;
-  is_amazon_product?: boolean;
-  amazon_affiliate_link?: string;
-  amazon_image_url?: string;
-  short_description_amazon?: string;
-  long_description_amazon?: string;
-}
+import { Product } from "@/services/productService";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -88,25 +69,11 @@ export function ProductForm({ product, onClose, onSave }: ProductFormProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = async (files: File[]) => {
-    setUploading(true);
-    try {
-      const uploadPromises = files.map(async (file) => {
-        const compressedFile = await compressImage(file);
-        return uploadToStorage(compressedFile!, file.name);
-      });
-      
-      const urls = await Promise.all(uploadPromises);
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, ...urls]
-      }));
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      alert('Failed to upload images');
-    } finally {
-      setUploading(false);
-    }
+  const handleImageUpload = (urls: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, ...urls]
+    }));
   };
 
   const removeImage = (index: number) => {

@@ -1,8 +1,11 @@
-import { Link, useLocation } from "react-router-dom";
+'use client'
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export function Navigation() {
-  const location = useLocation();
+  const pathname = usePathname();
 
   const navItems = [
     { href: "/", label: "Home" },
@@ -18,10 +21,10 @@ export function Navigation() {
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
-                  to={item.href}
+                  href={item.href}
                   className={cn(
                     "text-sm font-medium transition-colors hover:text-primary px-3 py-2 rounded-md",
-                    location.pathname === item.href
+                    pathname === item.href
                       ? "text-primary bg-primary/10"
                       : "text-muted-foreground hover:text-foreground"
                   )}
