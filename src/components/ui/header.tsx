@@ -16,8 +16,8 @@ interface HeaderProps {
   onFilterChange: (category: string) => void
   selectedCategory: string
   searchQuery: string
+  onAdminClick?: () => void // ✅ optional prop
 }
-
 const categories = [
   { id: "all", name: "All Products", icon: Package },
   { id: "Fashion", name: "Fashion", icon: ShoppingBag },
