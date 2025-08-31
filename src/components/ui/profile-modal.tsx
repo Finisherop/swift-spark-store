@@ -15,7 +15,7 @@ import {
   Copy,
   QrCode
 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "../../../components/NextAuthProvider";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 

@@ -6,7 +6,7 @@ import { Button } from "./button"
 import { Input } from "./input"
 import { AuthModal } from "./auth-modal"
 import { ProfileModal } from "./profile-modal"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "../../../components/NextAuthProvider"
 import { cn } from "@/lib/utils"
 import { AnimatedLogo } from "./swiftmart-logo" // ✅ animated logo import
 

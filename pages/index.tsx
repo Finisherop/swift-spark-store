@@ -1,5 +1,8 @@
 import Head from 'next/head'
-import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { HeroSection } from '@/components/ui/hero-section'
+import { ProductCard } from '@/components/ui/product-card'
+import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { createClient } from '@supabase/supabase-js'
 
@@ -39,14 +42,47 @@ const fetcher = async (url: string) => {
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const { data: products, error, isLoading } = useSWR<Product[]>('products', fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     dedupingInterval: 60000, // 1 minute
   })
 
-  if (isLoading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>
-  if (error) return <div className="flex justify-center items-center min-h-screen">Error loading products</div>
+  const handleExploreClick = () => {
+    // Scroll to products section or navigate to products page
+    const productsSection = document.getElementById('products-section')
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  const handleViewDetails = (product: Product) => {
+    router.push(`/product/${product.id}`)
+  }
+
+  const handleBuyNow = (product: Product) => {
+    // Open affiliate link in new tab
+    const link = product.affiliate_link || product.amazon_affiliate_link
+    if (link) {
+      window.open(link, '_blank', 'noopener,noreferrer')
+    }
+  }
+
+  if (isLoading) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+    </div>
+  )
+
+  if (error) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">Error loading products</h2>
+        <p className="text-gray-600">Please try again later.</p>
+      </div>
+    </div>
+  )
 
   return (
     <>
@@ -57,44 +93,46 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold text-center mb-8 text-gray-800 dark:text-white">
-            Welcome to Swift Spark Store
-          </h1>
+      {/* Hero Section */}
+      <HeroSection onExploreClick={handleExploreClick} />
+      
+      {/* Products Section */}
+      <section id="products-section" className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Featured Products
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Discover our curated collection of premium products at unbeatable prices
+            </p>
+          </div>
           
+          {/* Products Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products?.map((product) => (
-              <Link key={product.id} href={`/product/${product.id}`}>
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                  <div className="aspect-square relative">
-                    <img
-                      src={product.images?.[0] || product.amazon_image_url || '/placeholder.jpg'}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-green-600">
-                        ${product.price}
-                      </span>
-                      {product.original_price > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ${product.original_price}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Link>
+              <ProductCard
+                key={product.id}
+                product={product}
+                onViewDetails={handleViewDetails}
+                onBuyNow={handleBuyNow}
+              />
             ))}
           </div>
+          
+          {/* Load More Button */}
+          {products && products.length > 0 && (
+            <div className="text-center mt-12">
+              <button
+                onClick={() => router.push('/products')}
+                className="bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
+              >
+                View All Products
+              </button>
+            </div>
+          )}
         </div>
-      </main>
+      </section>
     </>
   )
 }

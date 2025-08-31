@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "./alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import { LogIn, UserPlus, Mail, Lock, User } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "../../../components/NextAuthProvider";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthModalProps {
@@ -29,7 +29,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     setLoading(true);
     setError("");
 
-    const { error } = await signIn(email, password);
+    const error = await signIn(email, password);
     
     if (error) {
       setError(error.message);
@@ -50,7 +50,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     setLoading(true);
     setError("");
 
-    const { error } = await signUp(email, password, fullName);
+    const error = await signUp(email, password);
     
     if (error) {
       if (error.message.includes('already registered')) {
