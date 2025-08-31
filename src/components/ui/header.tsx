@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/router"
 import { Search, ShoppingBag, Menu, X, User, Sparkles, Heart, Zap, Package } from "lucide-react"
 import { Button } from "./button"
 import { Input } from "./input"
@@ -8,14 +9,13 @@ import { AuthModal } from "./auth-modal"
 import { ProfileModal } from "./profile-modal"
 import { useAuth } from "../../../components/NextAuthProvider"
 import { cn } from "@/lib/utils"
-import { AnimatedLogo } from "./swiftmart-logo" // ✅ animated logo import
+import { AnimatedLogo } from "./swiftmart-logo"
 
 interface HeaderProps {
   onSearch: (query: string) => void
   onFilterChange: (category: string) => void
   selectedCategory: string
   searchQuery: string
-  onAdminClick?: () => void
 }
 
 const categories = [
@@ -26,17 +26,16 @@ const categories = [
   { id: "Beauty", name: "Beauty", icon: Heart },
 ]
 
-export function Header({
-  onSearch,
-  onFilterChange,
-  selectedCategory,
-  searchQuery,
-  onAdminClick,
-}: HeaderProps) {
+export function Header({ onSearch, onFilterChange, selectedCategory, searchQuery }: HeaderProps) {
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const { user } = useAuth()
+
+  const handleAdminClick = () => {
+    router.push("/admin/login")
+  }
 
   return (
     <>
@@ -48,7 +47,7 @@ export function Header({
             {/* Logo */}
             <div className="flex items-center">
               <div className="relative">
-                <AnimatedLogo /> {/* ✅ animated logo */}
+                <AnimatedLogo />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping"></div>
               </div>
             </div>
@@ -112,14 +111,17 @@ export function Header({
                 </Button>
               )}
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onAdminClick}
-                className="hidden md:flex hover-scale transition-bounce"
-              >
-                Admin
-              </Button>
+              {/* Admin button only visible if logged in */}
+              {user && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAdminClick}
+                  className="hidden md:flex hover-scale transition-bounce"
+                >
+                  Admin
+                </Button>
+              )}
 
               {/* Mobile Menu Button */}
               <Button
@@ -174,7 +176,6 @@ export function Header({
           {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t animate-fade-in">
-              {/* Mobile Auth/Admin Buttons */}
               <div className="space-y-2">
                 {user ? (
                   <Button
@@ -203,17 +204,19 @@ export function Header({
                   </Button>
                 )}
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    onAdminClick?.()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full justify-start"
-                >
-                  Admin
-                </Button>
+                {user && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      handleAdminClick()
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="w-full justify-start"
+                  >
+                    Admin
+                  </Button>
+                )}
               </div>
             </div>
           )}
