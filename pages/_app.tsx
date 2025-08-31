@@ -18,16 +18,15 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
-    // You can implement search functionality here
   }
 
   const handleFilterChange = (category: string) => {
     setSelectedCategory(category)
-    // You can implement category filtering here
   }
 
+  // ✅ Admin button click will push to admin login
   const handleAdminClick = () => {
-    router.push('/admin')
+    router.push('/admin/login')
   }
 
   return (
@@ -39,7 +38,7 @@ export default function App({ Component, pageProps }: AppProps) {
             onFilterChange={handleFilterChange}
             selectedCategory={selectedCategory}
             searchQuery={searchQuery}
-            onAdminClick={handleAdminClick}
+            onAdminClick={handleAdminClick} // ✅ pass prop to Header
           />
           <main className="flex-1">
             <Component {...pageProps} />
@@ -51,4 +50,3 @@ export default function App({ Component, pageProps }: AppProps) {
     </ThemeProvider>
   )
 }
-
